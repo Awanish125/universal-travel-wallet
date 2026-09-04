@@ -59,144 +59,161 @@ export default function TripDashboardPage({ params }: { params: { id: string } }
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <CreateWalletModal 
-        tripId={trip.id} 
-        isOpen={isWalletModalOpen} 
-        onClose={() => setIsWalletModalOpen(false)}
-        defaultCurrency={trip.baseCurrency}
-      />
-      <AddParticipantModal
-        tripId={trip.id}
-        isOpen={isParticipantModalOpen}
-        onClose={() => setIsParticipantModalOpen(false)}
-      />
-
-      {/* Header */}
-      <header className="px-4 py-6 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-border/50">
-        <div className="flex items-center justify-between mb-4">
-          <button 
-            onClick={() => router.push('/trips')}
-            className="p-2 -ml-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <div className="flex gap-2 items-center">
-            <button 
-              onClick={() => router.push(`/trips/${trip.id}/analytics`)}
-              className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors text-brand-accent"
-              title="View Analytics"
-            >
-              <BarChart3 className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => router.push(`/trips/${trip.id}/summary`)}
-              className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
-              title="View Summary Report"
-            >
-              <FileText className="w-5 h-5" />
-            </button>
-            <ThemeToggle />
-            <button 
-              onClick={() => router.push('/settings/backup')}
-              className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
-              title="Backup & Restore"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-        
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-foreground">{trip.name}</h1>
-          <p className="text-sm font-medium text-brand-accent flex items-center gap-1 mt-1">
-            {trip.country} • {trip.baseCurrency}
-          </p>
-        </div>
-      </header>
-
-      <main className="p-4 space-y-6 mt-2">
-        {/* Main Metric - Total Spent */}
-        <SoftCard className="p-6 flex flex-col items-center justify-center text-center space-y-2 py-8 relative overflow-hidden">
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-accent to-purple-500 opacity-50"></div>
-          <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total Spent</span>
-          <div className="text-4xl font-black tracking-tighter text-foreground flex items-center gap-1">
-            <span className="text-2xl text-muted-foreground font-bold">{metrics.totalSpent.currency}</span>
-            <AnimatedNumber 
-              value={metrics.totalSpent.toNumber()} 
-              decimals={2}
-            />
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">{metrics.expenseCount} expenses tracked</p>
-        </SoftCard>
-
-        {/* Budget Progress & Alert */}
-        <BudgetProgressCard 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <CreateWalletModal 
           tripId={trip.id} 
-          baseCurrency={trip.baseCurrency} 
-          totalSpent={metrics.totalSpent} 
+          isOpen={isWalletModalOpen} 
+          onClose={() => setIsWalletModalOpen(false)}
+          defaultCurrency={trip.baseCurrency}
+        />
+        <AddParticipantModal
+          tripId={trip.id}
+          isOpen={isParticipantModalOpen}
+          onClose={() => setIsParticipantModalOpen(false)}
         />
 
-        {/* Dynamic Category Spending Donut Preview */}
-        <MiniAnalyticsCard 
-          tripId={trip.id} 
-          baseCurrency={trip.baseCurrency} 
-        />
-
-        {/* Quick Actions Grid */}
-        <div>
-          <h2 className="text-sm font-bold text-foreground mb-3 px-1 uppercase tracking-wider">Quick Actions</h2>
-          <div className="grid grid-cols-4 gap-3">
-            <ActionIcon icon={Plus} label="Expense" color="emerald" onClick={() => router.push(`/trips/${trip.id}/expense`)} />
-            <ActionIcon icon={WalletIcon} label="Wallet" color="blue" onClick={() => setIsWalletModalOpen(true)} />
-            <ActionIcon icon={Repeat2} label="Exchange" color="amber" onClick={() => router.push(`/trips/${trip.id}/exchange`)} />
-            <ActionIcon icon={Calculator} label="Calculate" color="purple" onClick={() => router.push('/calculator')} />
-          </div>
-        </div>
-
-        {/* Participants Section */}
-        <div className="mb-2">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-base font-bold text-foreground">Companions</h3>
-            <SoftButton 
-              variant="ghost" 
-              onClick={() => setIsParticipantModalOpen(true)}
-              className="text-xs px-2 py-1 h-auto text-brand-accent hover:text-brand-accent"
+        {/* Header */}
+        <header className="py-6 border-b border-border/50">
+          <div className="flex items-center justify-between mb-4">
+            <button 
+              onClick={() => router.push('/trips')}
+              className="p-2 -ml-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
             >
-              + Add
-            </SoftButton>
-          </div>
-          <ParticipantList tripId={trip.id} />
-        </div>
-
-        {/* Recent Activity / Wallets Shell */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SoftCard className="p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-base font-bold text-foreground">My Wallets</h3>
-              <SoftButton 
-                variant="ghost" 
-                onClick={() => setIsWalletModalOpen(true)}
-                className="text-xs px-2 py-1 h-auto text-brand-accent hover:text-brand-accent"
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <div className="flex gap-2 items-center">
+              <button 
+                onClick={() => router.push(`/trips/${trip.id}/analytics`)}
+                className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors text-brand-accent"
+                title="View Analytics"
               >
-                + Add
-              </SoftButton>
+                <BarChart3 className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => router.push(`/trips/${trip.id}/summary`)}
+                className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
+                title="View Summary Report"
+              >
+                <FileText className="w-5 h-5" />
+              </button>
+              <div className="md:hidden">
+                <ThemeToggle />
+              </div>
+              <button 
+                onClick={() => router.push('/settings/backup')}
+                className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
+                title="Backup & Restore"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
             </div>
-            <WalletList tripId={trip.id} />
-          </SoftCard>
-          <SoftCard className="p-5">
-            <h3 className="text-base font-bold text-foreground mb-4">Recent Expenses</h3>
-            <ExpenseList tripId={trip.id} />
-          </SoftCard>
-        </div>
-
-        {/* Group Balances */}
-        <SoftCard className="p-5">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-base font-bold text-foreground">Who owes whom?</h3>
           </div>
-          <ParticipantBalancesList tripId={trip.id} baseCurrency={trip.baseCurrency} />
-        </SoftCard>
-      </main>
+          
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-foreground">{trip.name}</h1>
+            <p className="text-sm font-bold text-brand-accent flex items-center gap-1 mt-1">
+              {trip.country} • Base: {trip.baseCurrency}
+            </p>
+          </div>
+        </header>
+
+        {/* Main Content Layout Grid */}
+        <main className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Main Column (2 Cols on Desktop) */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Main Metric - Total Spent */}
+            <SoftCard className="p-6 flex flex-col items-center justify-center text-center space-y-2 py-8 relative overflow-hidden">
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-accent to-purple-500 opacity-50"></div>
+              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total Spent</span>
+              <div className="text-4xl sm:text-5xl font-black tracking-tighter text-foreground flex items-center gap-1">
+                <span className="text-2xl text-muted-foreground font-bold">{metrics.totalSpent.currency}</span>
+                <AnimatedNumber 
+                  value={metrics.totalSpent.toNumber()} 
+                  decimals={2}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">{metrics.expenseCount} expenses tracked</p>
+            </SoftCard>
+
+            {/* Quick Actions Grid */}
+            <div>
+              <h2 className="text-sm font-bold text-foreground mb-3 px-1 uppercase tracking-wider">Quick Actions</h2>
+              <div className="grid grid-cols-4 gap-3">
+                <ActionIcon icon={Plus} label="Expense" color="emerald" onClick={() => router.push(`/trips/${trip.id}/expense`)} />
+                <ActionIcon icon={WalletIcon} label="Wallet" color="blue" onClick={() => setIsWalletModalOpen(true)} />
+                <ActionIcon icon={Repeat2} label="Exchange" color="amber" onClick={() => router.push(`/trips/${trip.id}/exchange`)} />
+                <ActionIcon icon={Calculator} label="Calculate" color="purple" onClick={() => router.push('/calculator')} />
+              </div>
+            </div>
+
+            {/* Wallets & Expenses Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SoftCard className="p-5">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base font-bold text-foreground">My Wallets</h3>
+                  <SoftButton 
+                    variant="ghost" 
+                    onClick={() => setIsWalletModalOpen(true)}
+                    className="text-xs px-2 py-1 h-auto text-brand-accent hover:text-brand-accent"
+                  >
+                    + Add
+                  </SoftButton>
+                </div>
+                <WalletList tripId={trip.id} />
+              </SoftCard>
+              <SoftCard className="p-5">
+                <h3 className="text-base font-bold text-foreground mb-4">Recent Expenses</h3>
+                <ExpenseList tripId={trip.id} />
+              </SoftCard>
+            </div>
+
+          </div>
+
+          {/* Sidebar Column (1 Col on Desktop) */}
+          <div className="space-y-6">
+            
+            {/* Budget Progress & Alert */}
+            <BudgetProgressCard 
+              tripId={trip.id} 
+              baseCurrency={trip.baseCurrency} 
+              totalSpent={metrics.totalSpent} 
+            />
+
+            {/* Dynamic Category Spending Donut Preview */}
+            <MiniAnalyticsCard 
+              tripId={trip.id} 
+              baseCurrency={trip.baseCurrency} 
+            />
+
+            {/* Participants Section */}
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-base font-bold text-foreground">Companions</h3>
+                <SoftButton 
+                  variant="ghost" 
+                  onClick={() => setIsParticipantModalOpen(true)}
+                  className="text-xs px-2 py-1 h-auto text-brand-accent hover:text-brand-accent"
+                >
+                  + Add
+                </SoftButton>
+              </div>
+              <ParticipantList tripId={trip.id} />
+            </div>
+
+            {/* Group Balances */}
+            <SoftCard className="p-5">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-base font-bold text-foreground">Who owes whom?</h3>
+              </div>
+              <ParticipantBalancesList tripId={trip.id} baseCurrency={trip.baseCurrency} />
+            </SoftCard>
+
+          </div>
+
+        </main>
+      </div>
     </div>
   );
 }

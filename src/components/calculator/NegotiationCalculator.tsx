@@ -91,56 +91,61 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
       </header>
 
       {/* Main Display Area */}
-      <div className="flex-1 p-4 flex flex-col space-y-4">
+      <div className="flex-1 p-4 max-w-4xl mx-auto w-full flex flex-col space-y-4">
         
-        {/* Target Currency (e.g. Foreign Currency IDR) */}
-        <SoftCard className="p-5 relative overflow-hidden flex flex-col gap-1 border border-border hover:border-brand-accent/30 transition-colors focus-within:border-brand-accent/50 focus-within:ring-2 focus-within:ring-brand-accent/10">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
-              {calc.targetCurrency} (Foreign)
-            </span>
-          </div>
-          <input
-            type="text"
-            placeholder="e.g. 200K"
-            value={calc.targetInputValue}
-            onChange={(e) => calc.handleTargetChange(e.target.value)}
-            className="w-full bg-transparent text-4xl font-black tracking-tighter outline-none text-foreground placeholder:text-muted-foreground/30"
-          />
-          <div className="text-sm font-medium text-muted-foreground mt-1">
-            = {formatFullNumber(calc.targetFullValue)}
-          </div>
-        </SoftCard>
+        {/* Currencies Grid (Side-by-side on Desktop) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+          
+          {/* Target Currency (e.g. Foreign Currency IDR) */}
+          <SoftCard className="p-5 relative overflow-hidden flex flex-col gap-1 border border-border hover:border-brand-accent/30 transition-colors focus-within:border-brand-accent/50 focus-within:ring-2 focus-within:ring-brand-accent/10">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+                {calc.targetCurrency} (Foreign)
+              </span>
+            </div>
+            <input
+              type="text"
+              placeholder="e.g. 200K"
+              value={calc.targetInputValue}
+              onChange={(e) => calc.handleTargetChange(e.target.value)}
+              className="w-full bg-transparent text-4xl font-black tracking-tighter outline-none text-foreground placeholder:text-muted-foreground/30"
+            />
+            <div className="text-sm font-medium text-muted-foreground mt-1">
+              = {formatFullNumber(calc.targetFullValue)}
+            </div>
+          </SoftCard>
 
-        {/* Swap Button */}
-        <div className="flex justify-center -my-2 relative z-10">
-          <SoftButton 
-            variant="ghost" 
-            onClick={swapCurrencies}
-            className="rounded-full w-10 h-10 flex items-center justify-center bg-background border border-border shadow-sm text-foreground hover:bg-surface-strong"
-          >
-            <ArrowRightLeft className="w-4 h-4 rotate-90" />
-          </SoftButton>
+          {/* Swap Button (Absolute center on desktop, stacked on mobile) */}
+          <div className="flex justify-center md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 -my-2 md:my-0 relative z-20">
+            <SoftButton 
+              variant="ghost" 
+              onClick={swapCurrencies}
+              className="rounded-full w-10 h-10 flex items-center justify-center bg-background border border-border shadow-md text-foreground hover:bg-surface-strong"
+            >
+              <ArrowRightLeft className="w-4 h-4 md:rotate-0 rotate-90" />
+            </SoftButton>
+          </div>
+
+          {/* Base Currency (e.g. Home Currency INR) */}
+          <SoftCard className="p-5 relative overflow-hidden flex flex-col gap-1 border border-border hover:border-brand-accent/30 transition-colors focus-within:border-brand-accent/50 focus-within:ring-2 focus-within:ring-brand-accent/10">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-brand-accent uppercase tracking-wider">
+                {calc.baseCurrency} (Home)
+              </span>
+            </div>
+            <input
+              type="text"
+              placeholder="e.g. 300"
+              value={calc.baseInputValue}
+              onChange={(e) => calc.handleBaseChange(e.target.value)}
+              className="w-full bg-transparent text-4xl font-black tracking-tighter outline-none text-foreground placeholder:text-muted-foreground/30 text-brand-accent"
+            />
+            <div className="text-sm font-medium text-muted-foreground mt-1">
+              = {formatFullNumber(calc.baseFullValue)}
+            </div>
+          </SoftCard>
+
         </div>
-
-        {/* Base Currency (e.g. Home Currency INR) */}
-        <SoftCard className="p-5 relative overflow-hidden flex flex-col gap-1 border border-border hover:border-brand-accent/30 transition-colors focus-within:border-brand-accent/50 focus-within:ring-2 focus-within:ring-brand-accent/10">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-brand-accent uppercase tracking-wider">
-              {calc.baseCurrency} (Home)
-            </span>
-          </div>
-          <input
-            type="text"
-            placeholder="e.g. 300"
-            value={calc.baseInputValue}
-            onChange={(e) => calc.handleBaseChange(e.target.value)}
-            className="w-full bg-transparent text-4xl font-black tracking-tighter outline-none text-foreground placeholder:text-muted-foreground/30 text-brand-accent"
-          />
-          <div className="text-sm font-medium text-muted-foreground mt-1">
-            = {formatFullNumber(calc.baseFullValue)}
-          </div>
-        </SoftCard>
 
         {/* Discount Section */}
         {calc.discountPercentage > 0 && (
@@ -183,24 +188,26 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
         </div>
       </div>
 
-      <div className="p-4 bg-background border-t border-border/50 pb-8 flex gap-3">
-        <SoftButton 
-          variant="secondary"
-          className="flex-1 py-4 flex items-center justify-center gap-2"
-          onClick={() => setIsCashCounterOpen(true)}
-        >
-          <Banknote className="w-5 h-5 text-foreground" />
-          <span className="font-bold text-base text-foreground">Count Cash</span>
-        </SoftButton>
+      <div className="p-4 bg-background border-t border-border/50 pb-8">
+        <div className="max-w-4xl mx-auto flex gap-3">
+          <SoftButton 
+            variant="secondary"
+            className="flex-1 py-4 flex items-center justify-center gap-2"
+            onClick={() => setIsCashCounterOpen(true)}
+          >
+            <Banknote className="w-5 h-5 text-foreground" />
+            <span className="font-bold text-base text-foreground">Count Cash</span>
+          </SoftButton>
 
-        <SoftButton 
-          variant="primary"
-          className="flex-[2] py-4 shadow-soft-accent flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand-accent/90"
-          onClick={() => alert("Expense adding will be supported when linked to a trip.")}
-        >
-          <Plus className="w-5 h-5 text-white" />
-          <span className="font-bold text-base text-white">Add to Expense</span>
-        </SoftButton>
+          <SoftButton 
+            variant="primary"
+            className="flex-[2] py-4 shadow-soft-accent flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand-accent/90"
+            onClick={() => alert("Expense adding will be supported when linked to a trip.")}
+          >
+            <Plus className="w-5 h-5 text-white" />
+            <span className="font-bold text-base text-white">Add to Expense</span>
+          </SoftButton>
+        </div>
       </div>
     </div>
   );

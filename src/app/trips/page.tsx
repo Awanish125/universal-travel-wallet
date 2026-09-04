@@ -23,26 +23,29 @@ export default function TripsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-20">
-      <header className="py-6 flex items-center justify-between">
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-          My Trips
-        </h1>
-        <ThemeToggle />
-      </header>
+    <div className="min-h-screen bg-background pb-20">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header className="py-6 flex items-center justify-between">
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+            My Trips
+          </h1>
+          <div className="md:hidden">
+            <ThemeToggle />
+          </div>
+        </header>
 
-      {trips.length === 0 ? (
-        <div className="flex flex-col items-center justify-center mt-20 text-center space-y-4">
-          <div className="w-24 h-24 bg-surface-strong rounded-full flex items-center justify-center shadow-clay-convex-sm border border-white/5">
-            <Plane className="w-10 h-10 text-brand-accent opacity-80" />
+        {trips.length === 0 ? (
+          <div className="flex flex-col items-center justify-center mt-20 text-center space-y-4">
+            <div className="w-24 h-24 bg-surface-strong rounded-full flex items-center justify-center shadow-clay-convex-sm border border-white/5">
+              <Plane className="w-10 h-10 text-brand-accent opacity-80" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold">No trips yet</h2>
+              <p className="text-muted-foreground text-sm">Create your first trip to start tracking your travel finances.</p>
+            </div>
           </div>
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold">No trips yet</h2>
-            <p className="text-muted-foreground text-sm">Create your first trip to start tracking your travel finances.</p>
-          </div>
-        </div>
-      ) : (
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+        ) : (
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-2">
           {trips.map((trip) => (
             <StaggerItem 
               key={trip.id}
@@ -77,7 +80,7 @@ export default function TripsPage() {
       )}
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6">
+      <div className="fixed bottom-6 right-6 z-30">
         <SoftButton 
           variant="primary" 
           className="w-14 h-14 rounded-full flex items-center justify-center shadow-soft-accent bg-brand-accent hover:bg-brand-accent/90"
@@ -85,6 +88,7 @@ export default function TripsPage() {
         >
           <Plus className="w-6 h-6 text-white" />
         </SoftButton>
+      </div>
       </div>
     </div>
   );
