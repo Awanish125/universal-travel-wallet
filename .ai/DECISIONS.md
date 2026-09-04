@@ -53,3 +53,20 @@ This file tracks key architectural, design, and technical decisions made during 
   - Historical financial values (expenses, exchanges, settlements) remain 100% immutable regardless of live exchange rate updates.
   - Core application opens instantly from local CacheStorage and IndexedDB without waiting for network calls.
   - Standard Next.js Vercel deployment operates seamlessly without server dependencies or API route requirements.
+
+---
+
+### ADR 004: Permanent Git Branch Strategy & Production Deployment Branch
+
+- **Date:** 2026-09-04
+- **Status:** Accepted
+- **Context:** Defining branch workflow rules for production releases, reference baselines, and active feature development.
+- **Decision:**
+  1. `main` is preserved as the original Phase 1 reference baseline branch.
+  2. `production` is established as the live Vercel production deployment branch.
+  3. `development/*` (e.g. `development/phase-2-app-shell`) will be used for active feature development.
+  4. Features must be tested, reviewed, and verified before merging into `production`. Direct development on `production` or `main` is strictly prohibited.
+  5. Vercel deployment connects exclusively to `production`.
+- **Consequences:**
+  - `main` remains clean and immutable as the reference foundation.
+  - Live production code is cleanly isolated on `production` and updated only when feature branches pass full test/typecheck verification.
