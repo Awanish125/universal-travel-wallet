@@ -1,32 +1,31 @@
 # Universal Travel Wallet — Design System
-## Vercel/Geist Foundation + iOS 26 Liquid Glass Direction
+## Vercel/Geist Foundation + Soft Tactile UI (Claymorphism · Skeuomorphism · Neumorphism)
 
 > This document adapts the supplied Vercel/Geist design reference into the visual and interaction language for Universal Travel Wallet.
 >
-> The Vercel reference is the chosen foundation because its typography, spacing, restrained surfaces, precise grids, app controls, forms, cards, and responsive behavior are more suitable for a functional product than a marketing-first system.
+> The Vercel reference is the chosen foundation because its typography, spacing, precise grids, app controls, forms, cards, and responsive behavior are more suitable for a functional product than a marketing-first system.
 >
-> Apple-style Liquid Glass is the visual direction, not a brand-copy exercise. Do not copy Apple's exact UI, icons, layouts, colors, or proprietary visual identity.
+> **Revision note (supersedes the prior Liquid Glass direction — see ADR 005 in `.ai/DECISIONS.md`):** the visual material system changed from translucent glassmorphism to an opaque, tactile **Soft UI** system blending **Claymorphism**, **Neumorphism**, and **Skeuomorphism**. No blur, no translucency, no neon glow anywhere in the product.
 
 ---
 
 ## 1. Design Direction
 
-Universal Travel Wallet should feel like a **premium travel utility that belongs on a modern phone**.
+Universal Travel Wallet should feel like a **premium travel utility that belongs on a modern phone** — tactile, warm, and physical rather than glassy or neon.
 
 The product combines:
 
 - Vercel/Geist-style precision and restraint
-- iOS 26-inspired Liquid Glass materials
-- Dark-first visual design
-- Subtle depth and translucency
+- Soft, tactile surfaces that look gently sculpted out of (or pressed into) the page
+- Dark-purple night mode / white day mode — no neon lighting anywhere
 - Large, comfortable mobile controls
 - Clear financial hierarchy
-- Smooth Motion interactions
+- Smooth Motion, GSAP, and parallax interactions
 - Minimal typing and cognitive load
 
 The interface must feel **premium without becoming decorative**.
 
-The glass effect is a material system, not a decoration.
+The soft-UI material is a tactile system, not a decoration.
 
 ### Core visual hierarchy
 
@@ -35,14 +34,14 @@ CONTENT
   ↓
 Brand / travel imagery / contextual color
   ↓
-Glass UI surfaces
+Soft tactile UI surfaces (Clay / Neumorphic)
   ↓
 Controls and navigation
   ↓
-Motion and interaction feedback
+Motion, GSAP & parallax interaction feedback
 ```
 
-Content should remain visually important. Glass UI should sit above the content rather than replacing it.
+Content should remain visually important. Soft UI surfaces should sit above the content rather than replacing it.
 
 ---
 
@@ -84,72 +83,87 @@ Secondary actions should visually recede.
 
 ### 2.4 Content over chrome
 
-Liquid Glass should frame and elevate content.
+Soft UI surfaces should frame and elevate content, not compete with it.
 
-Do not cover important financial values with excessive blur, transparency, glow, or decoration.
+Do not cover important financial values with heavy shadow, texture, or decoration.
 
 ### 2.5 Native-feeling interaction
 
 Interactions should feel responsive and physical:
 
 - tap
-- press
+- press (surface visibly depresses — convex becomes concave)
 - swipe
 - drag
 - sheet presentation
 - shared transitions
 - list insertion/removal
 - value changes
+- scroll-linked parallax
 
 Animations must communicate state rather than exist only for visual spectacle.
 
 ---
 
-# 3. Dark-First Theme
+# 3. Theme System — Dark Purple Night Mode / White Day Mode
 
-Dark mode is the primary visual direction.
+Both modes are first-class. Night mode uses a deep dark-purple canvas; day mode uses a white canvas with a soft lavender-tinted gradient. Neither mode uses neon color, glow, blur, or translucency.
 
-The system must still support a complete light theme using the same semantic tokens.
-
-## Dark canvas
+## Night mode (dark) — Neumorphic canvas
 
 | Token | Value | Purpose |
 |---|---:|---|
-| `--background` | `#050506` | Main application canvas |
-| `--background-secondary` | `#0B0B0D` | Secondary content regions |
-| `--surface` | `rgba(255,255,255,0.055)` | Base glass surface |
-| `--surface-strong` | `rgba(255,255,255,0.085)` | Stronger glass surface |
-| `--surface-subtle` | `rgba(255,255,255,0.035)` | Subtle/inset surface |
-| `--surface-solid` | `#151518` | Fallback for complex content |
-| `--border` | `rgba(255,255,255,0.12)` | Standard glass edge |
-| `--border-strong` | `rgba(255,255,255,0.18)` | Focused/elevated edge |
-| `--text-primary` | `#F5F5F7` | Primary text |
-| `--text-secondary` | `#B8B8BE` | Secondary text |
-| `--text-muted` | `#7E7E86` | Metadata |
-| `--text-disabled` | `#55555C` | Disabled content |
+| `--background` | `#0C0D11` | Main application canvas (deep dark obsidian, matching reference UI) |
+| `--background-secondary` | `#12141A` | Secondary content regions |
+| `--background-gradient` | `linear-gradient(175deg, #0C0D11 0%, #12141A 50%, #0C0D11 100%)` | Soft linear background wash |
+| `--surface` | `#0C0D11` | Soft tactile base surface (depth comes from soft dual-tone shadow and subtle borders) |
+| `--surface-strong` | `#141721` | Elevated tactile surface |
+| `--surface-subtle` | `#090A0D` | Inset/subtle surface (e.g. input wells) |
+| `--surface-solid` | `#0F1117` | Fallback for complex content |
+| `--border` | `rgba(255,255,255,0.07)` | Hairline border for elevated components |
+| `--border-strong` | `rgba(255,255,255,0.12)` | Focused/elevated edge |
+| `--shadow-neu-highlight` | `rgba(255,255,255,0.05)` | Neumorphic light-source edge (top-left) |
+| `--shadow-neu-shadow` | `rgba(0,0,0,0.65)` | Neumorphic shadow edge (bottom-right) |
+| `--text-primary` | `#F1EDFB` | Primary text |
+| `--text-secondary` | `#B9AFD1` | Secondary text |
+| `--text-muted` | `#8377A0` | Metadata |
+| `--text-disabled` | `#5B5270` | Disabled content |
 
-Do not use pure white for large areas.
+## Day mode (light) — Clay canvas
 
-Do not use pure black as the only dark surface.
+| Token | Value | Purpose |
+|---|---:|---|
+| `--background` | `#FFFFFF` | Main application canvas |
+| `--background-secondary` | `#F5F3FC` | Secondary content regions |
+| `--background-gradient` | `linear-gradient(160deg, #FFFFFF 0%, #F1EDFC 100%)` | Soft linear background wash (white → soft lavender) |
+| `--surface` | `#FFFFFF` | Clay base surface |
+| `--surface-strong` | `#F8F6FF` | Elevated clay surface |
+| `--surface-subtle` | `#F2EFFC` | Inset/subtle surface |
+| `--surface-solid` | `#FFFFFF` | Fallback for complex content |
+| `--border` | `rgba(36,20,60,0.06)` | Hairline only where shadow alone isn't enough |
+| `--border-strong` | `rgba(36,20,60,0.10)` | Focused/elevated edge |
+| `--shadow-clay-highlight` | `rgba(255,255,255,0.9)` | Clay light-source edge (top-left) |
+| `--shadow-clay-shadow` | `rgba(124,90,220,0.16)` | Clay shadow edge (bottom-right) — hue-tinted violet, never plain black |
+| `--text-primary` | `#241C35` | Primary text |
+| `--text-secondary` | `#5C5470` | Secondary text |
+| `--text-muted` | `#8983A0` | Metadata |
+| `--text-disabled` | `#B7B2C6` | Disabled content |
 
-The small differences between dark surfaces should create depth.
+Do not use pure black anywhere. Do not use flat solid gray backgrounds — always the soft linear gradient wash. The small tonal differences between surfaces create depth; shadows (not opacity or blur) do the rest.
 
 ---
 
 # 4. Accent System
 
-Universal Travel Wallet does not use a single fixed brand color for everything.
-
-Use semantic accent colors.
+Universal Travel Wallet does not use a single fixed brand color for everything, but the signature color family across both themes is **violet / purple**, not blue.
 
 ### Primary accent
 
-Use a refined blue/cyan family as the default interactive accent.
-
 ```text
-Primary:        #4DA3FF
-Primary Strong: #68B4FF
-Primary Soft:   rgba(77,163,255,0.16)
+Primary:        #7C6FEF   (day mode default)
+Primary (night): #9B8CFF  (lifted for contrast on the dark-purple canvas)
+Primary Strong: #6152E0 (day) / #B4A7FF (night)
+Primary Soft:   rgba(124,111,239,0.14) (day) / rgba(155,140,255,0.16) (night)
 ```
 
 The accent should communicate:
@@ -162,67 +176,65 @@ The accent should communicate:
 
 ### Financial semantic colors
 
+Kept soft and matte — never neon or fluorescent:
+
 ```text
-Success: #35D07F
-Warning: #FFB84D
-Danger:  #FF5F67
-Info:    #64B5FF
+Success: #6FCF97
+Warning: #F5B971
+Danger:  #F2777A
+Info:    #8FA6FF
 ```
 
 Use semantic colors sparingly.
 
-### 4.1 Custom Gradient Accent Pattern
+### 4.1 Clay Gradient Icon Tile Pattern
 
-The supplied UI references establish an additional visual rule for Universal Travel Wallet:
-
-**Small icon containers should use curated linear-gradient backgrounds instead of flat fills.**
+**Small icon containers should use curated pastel linear gradients, rendered as puffy clay tiles, instead of flat fills or glass tiles.**
 
 This is a signature accent pattern and should be reused consistently across the application wherever an icon represents a card, transaction, category, wallet, status, quick action, or other compact visual identity.
 
-The goal is not to make every surface colorful. The goal is to make small visual anchors feel rich while keeping the surrounding interface calm and readable.
+The goal is not to make every surface colorful. The goal is to make small visual anchors feel rich and tactile while keeping the surrounding interface calm and readable.
 
-#### Gradient icon tile rules
+#### Clay icon tile rules
 
-Use a reusable `GradientIcon` / `GradientIconTile` pattern rather than creating one-off gradient containers.
+Use a reusable `GradientIconTile` pattern rather than creating one-off gradient containers.
 
 Each icon tile should generally contain:
 
 - a Lucide React icon
 - a compact rounded-square or circular container
-- a curated two-color or three-stop linear gradient
+- a curated two-color or three-stop pastel linear gradient
+- a soft **dual-tone clay shadow** (light highlight top-left, hue-tinted soft shadow bottom-right) so the tile reads as gently puffed out of the surface
 - a high-contrast icon color
 - enough internal padding for the icon to breathe
 - consistent sizing and radius tokens
-- a subtle border/highlight when needed for separation from glass surfaces
 
 Preferred visual direction:
 
 ```text
 color A ───────────────→ color B
-       subtle linear gradient
+       soft pastel linear gradient
+        + puffy clay shadow
 ```
 
-Gradients should normally be diagonal or gently directional rather than perfectly flat.
+Gradients should normally be diagonal or gently directional rather than perfectly flat, and pastel/matte rather than saturated or glowing.
 
 #### Curated gradient palette
 
-Gradients must come from a centralized semantic gradient palette.
+Gradients must come from a centralized semantic gradient palette. Every stop stays in the pastel/matte range — no neon or fluorescent saturation.
 
 Example roles:
 
 ```text
-gradient.primary
-gradient.blue
-gradient.cyan
-gradient.purple
-gradient.magenta
-gradient.green
-gradient.teal
-gradient.orange
-gradient.amber
-gradient.red
+gradient.primary   (violet → indigo)
+gradient.lavender
+gradient.mint
 gradient.pink
-gradient.indigo
+gradient.peach
+gradient.sky
+gradient.coral
+gradient.amber
+gradient.teal
 ```
 
 The exact color stops belong in the centralized design tokens. Components must not invent arbitrary gradient values inline.
@@ -247,10 +259,11 @@ Do not:
 - choose gradients that reduce icon contrast
 - use gradients as a substitute for status semantics
 - make every component a gradient surface
+- saturate a gradient into neon/glow territory
 
 #### Where gradients are encouraged
 
-Use gradient accents particularly for:
+Use clay gradient tiles particularly for:
 
 - card icons
 - wallet icons
@@ -272,29 +285,29 @@ Do not automatically apply the icon-gradient treatment to:
 - body copy
 - every button
 - every input
-- every glass surface
+- every soft-UI surface
 - chart backgrounds
-- page backgrounds
-- large containers where a calm glass or solid surface is more readable
+- page backgrounds (pages use the plain soft linear gradient wash from Section 3, not an icon gradient)
+- large containers where a calm clay/neumorphic surface is more readable
 
-Large gradient areas are allowed only when they are a deliberate content/identity surface, such as a wallet/card visual, destination artwork treatment, or a clearly defined feature hero.
+Large gradient areas are allowed only when they are a deliberate content/identity surface, such as a wallet/card visual (see Image reference 1's card treatment) or a clearly defined feature hero.
 
-#### Gradient + Liquid Glass relationship
+#### Gradient + Soft UI relationship
 
 Gradients belong primarily to the **content/accent layer**.
 
-Liquid Glass belongs primarily to the **UI/material layer**.
+Clay/Neumorphic material belongs primarily to the **UI/material layer**.
 
 Preferred composition:
 
 ```text
-Dark / light theme canvas
+Dark-purple / white theme canvas
         +
-subtle atmospheric color
+soft linear background gradient
         +
-glass card
+clay or neumorphic card
         +
-gradient icon tile
+clay gradient icon tile
         +
 clear content
 ```
@@ -318,16 +331,14 @@ The icon itself should remain optically centered and should not touch the tile e
 
 #### Gradient state behavior
 
-Gradient icon tiles may have Motion interactions:
+Clay gradient icon tiles may have Motion interactions:
 
-- subtle scale on press
+- press: convex shadow flips to a subtle concave/inset shadow (skeuomorphic push feedback)
 - slight brightness/saturation change on selected state
 - restrained hover treatment on pointer devices
 - shared transition when the same entity moves between views
 
-Do not animate the gradient continuously.
-
-The gradient is part of the visual identity, not an ambient animation.
+Do not animate the gradient continuously. The gradient is part of the visual identity, not an ambient animation.
 
 #### Gradient accessibility
 
@@ -342,19 +353,23 @@ Every semantic state must also have:
 
 If a gradient reduces icon or text contrast, change the gradient or increase contrast. Never preserve a gradient at the expense of accessibility.
 
-Never turn complete cards or screens into large saturated color blocks unless the state genuinely requires it.
-
 ---
 
-# 5. Liquid Glass Material System
+# 5. Soft Tactile Material System (Claymorphism · Neumorphism · Skeuomorphism)
 
-Liquid Glass is the primary surface language.
+This is the primary surface language, replacing the prior Liquid Glass system entirely. Every surface is **opaque** — there is no blur, no translucency, and nothing behind a surface should ever show through it.
+
+The system blends three related ideas:
+
+- **Claymorphism** (day mode default): solid, matte, puffy 3D shapes with a light highlight and a soft, hue-tinted shadow — like the surface was molded from soft clay.
+- **Neumorphism** (night mode default): surfaces rendered in a color very close to the canvas, distinguished only by a soft dual-tone shadow (a light "catch-light" edge plus a darker shadow edge), so elements look extruded from or pressed into the same material as the background.
+- **Skeuomorphism**: the umbrella principle that controls should look and behave like physical objects — buttons look pressable, inputs look like a groove something can be typed into, toggles look like a real switch. Motion press-feedback (convex → concave) is what sells this.
 
 ## Material levels
 
-### Glass 0 — Content
+### Surface 0 — Content
 
-No glass.
+No clay/neumorphic treatment.
 
 Used for:
 
@@ -364,12 +379,14 @@ Used for:
 - travel imagery
 - primary content
 
-### Glass 1 — Standard
+### Surface 1 — Clay Card (day mode default)
 
 ```css
-background: rgba(255, 255, 255, 0.055);
-backdrop-filter: blur(24px) saturate(145%);
-border: 1px solid rgba(255, 255, 255, 0.10);
+background: var(--surface);
+border-radius: var(--radius-lg);
+box-shadow:
+  -8px -8px 16px var(--shadow-clay-highlight),
+  10px 10px 22px var(--shadow-clay-shadow);
 ```
 
 Used for:
@@ -379,13 +396,21 @@ Used for:
 - compact controls
 - secondary containers
 
-### Glass 2 — Elevated
+### Surface 1 — Neumorphic Card (night mode default)
 
 ```css
-background: rgba(255, 255, 255, 0.085);
-backdrop-filter: blur(30px) saturate(155%);
-border: 1px solid rgba(255, 255, 255, 0.14);
+background: var(--surface);
+border-radius: var(--radius-lg);
+box-shadow:
+  -6px -6px 14px var(--shadow-neu-highlight),
+  8px 8px 18px var(--shadow-neu-shadow);
 ```
+
+Same role as the clay card above — the two are theme variants of one `SoftCard` component, never separate components.
+
+### Surface 2 — Elevated
+
+Deeper shadow spread and a slightly larger offset than Surface 1.
 
 Used for:
 
@@ -394,7 +419,7 @@ Used for:
 - selected surfaces
 - elevated widgets
 
-### Glass 3 — Floating
+### Surface 3 — Floating
 
 Used for:
 
@@ -404,66 +429,68 @@ Used for:
 - navigation surfaces
 - popovers
 
-It may use stronger opacity and blur for readability.
+Uses the deepest shadow in the system so it visibly separates from the canvas. Never make a floating surface hard to distinguish from the page behind it.
 
-Never make large overlays excessively transparent.
+### Inset / Concave surface
+
+The inverse of the above — used for inputs, wells, and **pressed** states. Shadows swap sides (highlight bottom-right, shadow top-left) so the surface reads as pushed *into* the page rather than raised out of it.
+
+```css
+box-shadow:
+  inset 4px 4px 10px var(--shadow-clay-shadow),
+  inset -4px -4px 10px var(--shadow-clay-highlight);
+```
+
+(Swap `clay-*` for `neu-*` tokens in night mode.)
 
 ---
 
-# 6. Glass Rules
+# 6. Soft UI Rules
 
 ### Do
 
-- Keep glass translucent.
-- Allow contextual background color to subtly influence the surface.
-- Use thin luminous borders.
-- Use blur to separate foreground controls from content.
-- Use different material strengths for hierarchy.
-- Preserve readable contrast.
-- Keep the content behind glass visually meaningful.
+- Keep every surface fully opaque.
+- Use a light highlight + a darker, theme-tinted shadow on every raised surface (never a single flat drop-shadow).
+- Tint shadows with the theme's hue (violet-tinted in both modes) rather than plain black/white.
+- Use inset/concave shadows for inputs and pressed states.
+- Use different material strengths (Surface 1/2/3) for hierarchy.
+- Preserve readable contrast — text and financial values sit on fully opaque surfaces, so contrast is simple to guarantee.
+- Keep shadow softness and radius consistent across all components.
 
 ### Don't
 
-- Do not use glass on every element.
-- Do not stack multiple translucent cards unnecessarily.
-- Do not use huge blur values everywhere.
-- Do not use bright neon glows as decoration.
-- Do not make financial values translucent.
-- Do not use glass where a flat content surface is clearer.
-- Do not make the entire page look like frosted plastic.
+- Do not use `backdrop-filter` / blur anywhere.
+- Do not use translucent or semi-transparent surfaces.
+- Do not use neon glow, bright glowing borders, or luminous rings as decoration.
+- Do not use a single hard black drop-shadow — always the soft dual-tone pair.
+- Do not make financial values sit on a busy or low-contrast surface.
+- Do not use heavy, high-contrast shadows that look like a hard drop-shadow rather than a soft emboss.
+- Do not make the entire page one giant clay surface — vary elevation deliberately.
 
-The result should feel **fluid and layered**, not cloudy.
+The result should feel **soft, tactile, and physical** — like the UI is made of the same soft material as the page, not a pane of glass floating above it.
 
 ---
 
-# 7. Background Atmosphere
+# 7. Soft Gradient Background
 
-The background may contain extremely subtle contextual color.
+Every screen sits on a **soft linear gradient background** — never a flat single color, never a radial neon glow field, never blurred atmospheric color blobs.
 
-For example:
-
-- blue around currency content
-- green around savings/success
-- warm amber around bargaining
-- destination-inspired photography on trip surfaces
-
-Use blurred atmospheric layers behind glass.
+```text
+Night mode:  linear-gradient(160deg, #1B1428 0%, #0F0B18 100%)
+Day mode:    linear-gradient(160deg, #FFFFFF 0%, #F1EDFC 100%)
+```
 
 Example concept:
 
 ```text
-Dark canvas
-    +
-very subtle blurred color field
+Soft linear gradient canvas
     +
 content
     +
-glass controls
+clay / neumorphic controls (opaque, no blur)
 ```
 
-Atmospheric color must remain low contrast.
-
-Never use large decorative gradients as the main visual feature.
+The gradient must remain low-contrast and calm — it sets a gentle mood, it is never the main visual feature, and it must never be radial, glowing, or neon-colored.
 
 ---
 
@@ -553,18 +580,18 @@ Mobile layouts should generally use 16px horizontal page gutters.
 
 # 10. Corner Radius
 
-Liquid Glass requires a softer geometry than the source Vercel system.
+Soft tactile surfaces read best with generous, consistent geometry — slightly larger and puffier than a flat/hairline system.
 
 Use:
 
 | Token | Value | Use |
 |---|---:|---|
-| `radius-xs` | 8px | Tiny controls |
-| `radius-sm` | 12px | Inputs / compact controls |
-| `radius-md` | 16px | Standard cards |
-| `radius-lg` | 20px | Important cards |
-| `radius-xl` | 24px | Large glass containers |
-| `radius-sheet` | 28px | Bottom sheets |
+| `radius-xs` | 10px | Tiny controls |
+| `radius-sm` | 14px | Inputs / compact controls |
+| `radius-md` | 18px | Standard cards |
+| `radius-lg` | 24px | Important cards |
+| `radius-xl` | 28px | Large soft-UI containers |
+| `radius-sheet` | 32px | Bottom sheets |
 | `radius-pill` | 999px | Pills |
 | `radius-full` | 50% | Circular controls |
 
@@ -582,7 +609,7 @@ Do not build a desktop dashboard and shrink it for mobile.
 
 ## Bottom navigation
 
-Use a floating or visually separated Liquid Glass bottom navigation.
+Use a floating, visually separated soft clay/neumorphic bottom navigation (Surface 3).
 
 Suggested structure:
 
@@ -598,14 +625,14 @@ Selected item:
 
 - accent-colored icon
 - accent-colored label
-- subtle selected glass/tint treatment
+- a subtle inset/concave "active pill" behind the selected tab (looks pressed in), not a glow
 
 Unselected items:
 
 - muted icon
 - muted label
 
-The navigation should visually float above content.
+The navigation should visually float above content (Surface 3 shadow depth).
 
 ## Desktop
 
@@ -632,7 +659,7 @@ A quick action can use:
 
 - icon
 - short label
-- subtle glass surface
+- soft clay/neumorphic surface (convex at rest, concave when pressed)
 - accent for the most important action
 
 Avoid oversized dashboard-style button grids.
@@ -643,23 +670,21 @@ Avoid oversized dashboard-style button grids.
 
 ## Primary
 
-Primary actions use a tinted Liquid Glass treatment.
+Primary actions use a convex clay/neumorphic surface with an accent-tinted fill.
 
 ```text
-accent tint
+accent tint fill
 +
 high contrast text
 +
-glass border
+soft dual-tone shadow (convex)
 +
-subtle depth
+on press: shadow flips to inset/concave
 ```
-
-Primary actions may use the accent color as a restrained background tint.
 
 ## Secondary
 
-Transparent or low-opacity glass.
+Neutral surface color (not accent-tinted), same convex/concave shadow behavior.
 
 ## Tertiary
 
@@ -685,14 +710,14 @@ Never make an important action depend on a tiny icon.
 
 # 14. Inputs
 
-Inputs should feel integrated into the glass material.
+Inputs use the **inset/concave** treatment from Section 5 — they look like a groove pressed into the surface, ready to receive input (the classic skeuomorphic/neumorphic input pattern).
 
 Standard input:
 
-- glass background
-- thin border
+- inset clay/neumorphic well (concave shadow)
+- no border needed when the inset shadow alone reads clearly; a hairline may be added for extra definition
 - 48–52px minimum height
-- clear focus state
+- clear focus state (accent-colored inset ring)
 - strong text contrast
 - large numeric input treatment for money
 
@@ -745,13 +770,13 @@ Cards should not all look identical.
 
 Use semantic variants.
 
-### Standard glass card
+### Standard soft card
 
-For normal content.
+For normal content (Surface 1).
 
-### Elevated glass card
+### Elevated soft card
 
-For important information.
+For important information (Surface 2).
 
 ### Financial card
 
@@ -773,9 +798,9 @@ For:
 
 ### Interactive card
 
-For tappable destinations.
+For tappable destinations — press feedback flips the shadow to concave.
 
-All variants must reuse the same underlying card component.
+All variants must reuse the same underlying `SoftCard` component.
 
 ### Card accent rule
 
@@ -786,9 +811,9 @@ When an icon is present, prefer the shared `GradientIconTile` pattern from Secti
 This creates a consistent visual rhythm:
 
 ```text
-[ gradient icon ]  Label / title / metadata
-                    Primary value
-                    Supporting information
+[ clay gradient icon ]  Label / title / metadata
+                        Primary value
+                        Supporting information
 ```
 
 The gradient icon should provide color and personality while the card surface remains calm and readable.
@@ -799,7 +824,7 @@ Do not make the entire standard card gradient merely because its icon uses a gra
 
 # 17. Wallet Card
 
-Wallet information should be glanceable.
+Wallet information should be glanceable. This is the one place a **large, deliberate gradient surface** is encouraged (matching a physical card/wallet visual), rendered with the same clay puffiness as everything else — never glossy or glassy.
 
 Example:
 
@@ -815,7 +840,7 @@ Updated today
 
 The primary amount should dominate.
 
-Wallet cards can subtly reflect the currency's identity through contextual accent tint, but must remain readable.
+Wallet cards can use a richer violet/indigo gradient fill to read like a physical card, but must remain readable — text sits in solid high-contrast color, never gradient text.
 
 ---
 
@@ -870,7 +895,7 @@ The strongest value should be visually dominant.
 
 # 20. Settlement UI
 
-Settlement screens should use a focused glass composition.
+Settlement screens should use a focused soft clay/neumorphic composition.
 
 Example:
 
@@ -994,7 +1019,7 @@ Keep controls simple enough for one-handed use.
 
 Bottom sheets are preferred for mobile contextual actions.
 
-Use Liquid Glass for:
+Use soft clay/neumorphic Surface 3 for:
 
 - currency selection
 - participant selection
@@ -1009,7 +1034,7 @@ Sheets should:
 - have clear hierarchy
 - maintain focus
 - support dismissal gestures where appropriate
-- remain readable over complex backgrounds
+- remain fully opaque and easy to read regardless of what's behind them
 
 Dialogs should be reserved for:
 
@@ -1039,7 +1064,7 @@ Charts should support:
 - tooltips
 - responsive sizing
 
-Glass should frame the chart rather than obscure it.
+Frame the chart inside a soft clay/neumorphic container rather than obscuring it with texture or shadow.
 
 ---
 
@@ -1058,12 +1083,12 @@ Do not mix unrelated icon libraries.
 
 ### Icon color treatment
 
-Icons used as compact visual anchors should normally sit inside the shared gradient icon tile.
+Icons used as compact visual anchors should normally sit inside the shared clay gradient icon tile.
 
 Prefer:
 
 ```text
-GradientIconTile
+GradientIconTile (clay puffy surface)
     ↓
 Lucide icon
 ```
@@ -1080,25 +1105,25 @@ The gradient treatment is a reusable visual pattern, not a reason to create cust
 
 ---
 
-# 27. Motion
+# 27. Motion, GSAP & Parallax
 
-Motion is part of the design system.
+Motion is part of the design system, alongside GSAP for scroll-driven work and parallax for depth. They are complementary, not competing systems.
 
-Use the `motion` package for React interactions.
-
-Official installation:
+Use the `motion` package (Framer Motion) for component-level React interactions:
 
 ```bash
 npm install motion
 ```
-
-Use imports from:
 
 ```ts
 import { motion } from "motion/react";
 ```
 
 Motion's official React documentation supports Next.js and React 18.2+ and provides layout, gestures, transitions, presence, reduced-motion support, and other interaction primitives.
+
+Use **GSAP** (with `ScrollTrigger`) for scroll-orchestrated sequences and finer-grained timeline control that Motion doesn't cover well — always scoped via `gsap.context()` with proper cleanup on unmount.
+
+Use **parallax** deliberately and sparingly for depth cues (e.g. background gradient drifting slightly slower than foreground content on scroll) — never so much that it distracts from financial content or hurts scroll performance.
 
 ## Motion principles
 
@@ -1140,7 +1165,7 @@ Reusable animation patterns:
 - page enter
 - sheet enter
 - modal enter
-- card press
+- card press (convex → concave shadow flip)
 - list item enter
 - list item exit
 - tab transition
@@ -1149,6 +1174,7 @@ Reusable animation patterns:
 - success state
 - error state
 - expand/collapse
+- scroll parallax (GSAP `ScrollTrigger`)
 
 Do not duplicate animation configuration across components.
 
@@ -1180,9 +1206,9 @@ Never let animation become the source of truth.
 Every reusable interactive component should define:
 
 ```text
-default
+default   (convex clay/neumorphic)
 hover
-pressed
+pressed   (shadow flips to concave/inset)
 focus
 selected
 disabled
@@ -1198,7 +1224,7 @@ Mobile-first components should prioritize:
 - focus
 - disabled
 
-Hover must never be required to understand or operate the product.
+Hover must never be required to understand or operate the product. The **pressed** state is the most important tactile signal in this system — it must always visibly invert the shadow direction, not just change opacity or scale.
 
 ---
 
@@ -1296,9 +1322,7 @@ Support:
 - readable financial values
 - accessible dialogs and sheets
 
-Liquid Glass must never reduce text contrast.
-
-If blur or transparency makes content difficult to read, increase material opacity.
+Because every soft-UI surface is fully opaque, contrast is controlled directly by color choice rather than by blur or opacity — there is no translucency to fight. If a shadow ever makes content harder to read, soften the shadow rather than reducing surface contrast.
 
 ---
 
@@ -1378,11 +1402,11 @@ Contains:
 - controls
 - floating actions
 
-The UI layer uses Liquid Glass.
+The UI layer uses the Soft Clay/Neumorphic material system (Section 5).
 
 The content layer provides identity.
 
-This separation keeps the app visually rich without making every surface glass.
+This separation keeps the app visually rich without making every surface the same tactile material.
 
 ---
 
@@ -1393,7 +1417,7 @@ All visual values must be centralized.
 Do not scatter:
 
 ```css
-#4DA3FF
+#7C6FEF
 rgba(...)
 20px
 28px
@@ -1407,9 +1431,10 @@ Examples:
 
 ```text
 color.background
-color.surface.glass
-color.surface.glassStrong
-color.border.glass
+color.backgroundGradient
+color.surface
+color.surfaceStrong
+color.border
 color.text.primary
 color.text.secondary
 color.accent.primary
@@ -1424,11 +1449,11 @@ space.sm
 space.md
 space.lg
 
-shadow.glass
-shadow.floating
-
-blur.glass
-blur.floating
+shadow.clayHighlight
+shadow.clayShadow
+shadow.neuHighlight
+shadow.neuShadow
+shadow.inset
 ```
 
 The exact implementation can use Tailwind CSS variables.
@@ -1461,13 +1486,14 @@ ChartContainer
 QuickAction
 NegotiationInput
 CashCounter
-GlassCard
-GlassButton
-GlassIconButton
-GlassNavigation
+SoftCard
+SoftButton
+SoftIconButton
+SoftNavigation
+GradientIconTile
 ```
 
-A component should accept data and configuration.
+A component should accept data and configuration, and render either its clay or neumorphic variant based on the active theme — never as two separate components.
 
 Do not copy the same UI into multiple screens.
 
@@ -1478,7 +1504,7 @@ Do not copy the same UI into multiple screens.
 Prefer:
 
 ```text
-GlassCard
+SoftCard
     ↓
 FinancialCard
     ↓
@@ -1490,54 +1516,47 @@ rather than creating independent card implementations.
 Likewise:
 
 ```text
-GlassButton
+SoftButton
     ↓
 PrimaryButton
 SecondaryButton
 IconButton
 ```
 
-The underlying material and interaction behavior should remain consistent.
+The underlying material (Section 5) and interaction behavior (convex ⇄ concave on press) should remain consistent.
 
 ---
 
 # 40. Design System Do's
 
-- Use dark mode as the primary visual expression.
-- Use Liquid Glass selectively.
-- Keep financial values highly readable.
-- Use subtle depth.
-- Use thin borders rather than heavy shadows.
-- Use contextual color sparingly.
+- Support both dark-purple night mode and white day mode as first-class themes.
+- Use the Soft Clay/Neumorphic material for every interactive surface.
+- Keep financial values highly readable on fully opaque surfaces.
+- Use soft, dual-tone, theme-tinted shadows (never a single flat drop-shadow).
+- Use inset/concave shadows for inputs and pressed states.
 - Use large touch targets.
-- Use reusable components.
-- Use consistent spacing.
-- Use Motion for meaningful interactions.
+- Use reusable components that switch material variant by theme, not by duplication.
+- Use consistent spacing and radius tokens.
+- Use Motion, GSAP, and restrained parallax for meaningful interactions.
 - Preserve accessibility.
 - Keep screens calm and focused.
-- Let content remain visible through glass where appropriate.
-- Use stronger opacity for large surfaces.
-- Support both dark and light themes.
-- Prefer composition over duplication.
-- Use curated linear gradients as a recurring accent pattern for compact icon containers.
+- Use soft linear background gradients (never radial glow, never neon).
+- Use pastel clay gradients as a recurring accent pattern for compact icon containers.
 - Keep gradient variation controlled, deterministic, semantic, and theme-aware.
-- Use gradients to add personality to small visual anchors while keeping large surfaces calm.
 
 ---
 
 # 41. Design System Don'ts
 
 - Do not copy Apple's interface directly.
-- Do not turn every element into glass.
-- Do not use glass as a substitute for hierarchy.
-- Do not use excessive blur.
-- Do not use neon/glowing UI everywhere.
-- Do not use heavy shadows.
+- Do not use `backdrop-filter`, blur, or any translucent surface anywhere.
+- Do not use neon, glowing, or fluorescent color anywhere in the product.
+- Do not use a single hard black drop-shadow — always the soft dual-tone pair.
 - Do not use random decorative gradients. Use only curated, centralized gradient tokens with controlled semantic variation.
 - Do not use tiny controls.
 - Do not hide financial values behind animation.
 - Do not create desktop-first dashboard layouts.
-- Do not create duplicate components.
+- Do not create duplicate components for each theme — one component, theme-aware tokens.
 - Do not place business calculations inside UI components.
 - Do not use multiple competing icon libraries.
 - Do not introduce another design language for individual modules.
@@ -1563,19 +1582,19 @@ The Universal Travel Wallet adaptation intentionally changes:
 ```text
 Near-white Vercel canvas
         ↓
-Dark-first travel canvas
+Dark-purple night canvas / white day canvas, soft linear gradient wash
 
 Flat/hairline cards
         ↓
-Translucent Liquid Glass materials
+Opaque Soft Clay/Neumorphic materials (Claymorphism · Skeuomorphism · Neumorphism)
 
 Marketing-oriented hero gradients
         ↓
-Subtle contextual travel atmosphere
+Pastel clay gradient icon tiles + one deliberate wallet/card gradient surface
 
 Vercel marketing buttons
         ↓
-Mobile utility controls
+Mobile utility controls with tactile press feedback
 
 Documentation/product marketing rhythm
         ↓
@@ -1583,7 +1602,7 @@ App-like travel workflow
 
 Static visual states
         ↓
-Purposeful Motion interactions
+Purposeful Motion, GSAP & parallax interactions
 ```
 
 ---
@@ -1592,41 +1611,41 @@ Purposeful Motion interactions
 
 The finished product should feel like:
 
-**A premium dark travel-money application with the precision of a modern developer product, the calmness of a high-end mobile app, and a restrained iOS 26-inspired Liquid Glass material system.**
+**A premium, tactile travel-money application with the precision of a modern developer product, the warmth of a hand-molded object, and zero neon.**
 
 It should never feel like:
 
 - a generic SaaS dashboard
 - a cryptocurrency dashboard
 - a glassmorphism template
+- a neon/cyberpunk dashboard
 - an Apple clone
 - a marketing landing page
 - an over-animated design showcase
 
 The strongest impression should be:
 
-> **"This feels like a polished travel app I would actually want to use every day while travelling."**
+> **"This feels like a soft, physical travel app I would actually want to touch and use every day while travelling."**
 
 A recognizable signature detail should appear throughout the product:
 
-> **Small icons can carry rich linear-gradient color accents, while the surrounding UI stays calm, precise, and readable.**
+> **Small icons carry rich pastel gradient color inside puffy clay tiles, while the surrounding UI stays calm, opaque, and readable.**
 
 This gradient language should be visible across cards, transactions, wallets, categories, quick actions, and other appropriate compact icon surfaces without turning the product into a gradient-heavy template.
 
 ---
 
-
 # 43.1 Screenshot-Derived Custom Pattern Reference
 
-The custom gradient rule in this document is derived from the supplied UI references.
+The custom gradient rule in this document is derived from the supplied UI references (Claymorphism finance app, Neumorphic widget screen, Neumorphic dark music player).
 
 Observed patterns that should influence implementation:
 
-- Light card surfaces with thin borders and generous internal spacing.
-- A compact leading icon container is used as a strong visual anchor.
-- Icon containers use saturated linear gradients with varied color families.
-- Different cards/items can use different gradient families while preserving the same icon-container geometry.
-- Status pills use strong semantic colors and compact pill geometry.
+- Soft, puffy card surfaces with generous internal spacing and rounded geometry (Claymorphism reference).
+- A compact leading icon container is used as a strong visual anchor, rendered as a puffy pastel tile.
+- Icon containers use matte pastel gradients with varied color families, never neon-saturated.
+- Dark mode controls (Neumorphism reference) are monochrome-on-monochrome, distinguished purely by soft dual-tone shadow, with a single accent color reserved for the primary/selected control.
+- Status pills use strong-but-matte semantic colors and compact pill geometry.
 - Large financial values remain solid, high-contrast text rather than gradient text.
 - Progress indicators use semantic color while the surrounding card remains visually restrained.
 - Payment/transaction rows use the same icon-container concept to create a consistent list rhythm.
@@ -1635,13 +1654,13 @@ Observed patterns that should influence implementation:
 
 Implementation interpretation for Universal Travel Wallet:
 
-1. Keep the existing dark-first Liquid Glass foundation.
-2. Add the screenshot-derived gradient icon treatment as a signature accent pattern.
+1. Adopt the Soft Clay/Neumorphic material foundation described in Section 5 (dark-purple night mode = neumorphic, white day mode = claymorphic).
+2. Add the screenshot-derived pastel gradient icon treatment as a signature accent pattern.
 3. Use gradients through centralized tokens and reusable components.
 4. Prefer deterministic semantic assignment over true randomness.
 5. Preserve financial readability and accessibility.
 6. Keep the overall interface premium and controlled rather than turning it into a generic colorful gradient template.
-7. Apply the same pattern consistently across repeated UI instead of recreating gradient styles screen by screen.
+7. Apply the same pattern consistently across repeated UI instead of recreating gradient/shadow styles screen by screen.
 
 ---
 
@@ -1655,9 +1674,9 @@ Before implementing a new visual component:
 4. Create a new component only when the concept is distinct.
 5. Centralize new tokens.
 6. Define responsive behavior.
-7. Define interaction states.
-8. Define Motion behavior where useful.
-9. Verify dark and light themes.
+7. Define interaction states, including the convex/concave press flip.
+8. Define Motion/GSAP/parallax behavior where useful.
+9. Verify dark-purple night mode and white day mode.
 10. Verify accessibility.
 11. Verify the component does not duplicate existing functionality.
 
@@ -1682,4 +1701,3 @@ When visual decisions conflict, use this order:
 ```
 
 A beautiful effect must always lose to clarity.
-

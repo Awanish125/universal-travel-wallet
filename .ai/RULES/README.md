@@ -23,8 +23,8 @@ The rules are categorized into the following domain-specific files:
   *Financial logic ownership, financial precision, historical financial immutability, offline-first architecture, database encapsulation (Dexie/IndexedDB), and migration safety.*
 
 - **[04-UI-UX-AND-MOTION.md](file:///d:/awi/universal-travel-wallet/.ai/RULES/04-UI-UX-AND-MOTION.md)**  
-  Rules 41, 42, 62, 64, 69.  
-  *Apple Liquid Glass visual rules, Motion animation principles, accessibility standards, state handling (loading/empty/error/offline), and design system consistency.*
+  Rules 41, 42, 62, 64, 69, 73, 74.  
+  *Soft Tactile UI (Claymorphism/Neumorphism, ADR 005) visual rules, Motion/GSAP/parallax animation principles, accessibility standards, state handling (loading/empty/error/offline), design system consistency, and UI/UX Pro Max governance.*
 
 - **[05-DEPENDENCIES-AND-RESEARCH.md](file:///d:/awi/universal-travel-wallet/.ai/RULES/05-DEPENDENCIES-AND-RESEARCH.md)**  
   Rules 24, 25, 26, 27, 67, 68.  

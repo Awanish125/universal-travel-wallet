@@ -1,19 +1,16 @@
 import React from 'react';
 import { clsx } from 'clsx';
 
-export type GradientRole = 
+export type GradientRole =
   | 'primary'
-  | 'blue'
-  | 'cyan'
-  | 'purple'
-  | 'magenta'
-  | 'green'
-  | 'teal'
-  | 'orange'
-  | 'amber'
-  | 'red'
+  | 'lavender'
+  | 'mint'
   | 'pink'
-  | 'indigo';
+  | 'peach'
+  | 'sky'
+  | 'coral'
+  | 'amber'
+  | 'teal';
 
 export type TileSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -25,18 +22,15 @@ export interface GradientIconTileProps {
 }
 
 const GRADIENT_ROLES: Record<GradientRole, string> = {
-  primary: 'from-[#4DA3FF] to-[#68B4FF]',
-  blue: 'from-[#3B82F6] to-[#60A5FA]',
-  cyan: 'from-[#06B6D4] to-[#38BDF8]',
-  purple: 'from-[#8B5CF6] to-[#C084FC]',
-  magenta: 'from-[#D946EF] to-[#F472B6]',
-  green: 'from-[#10B981] to-[#34D399]',
-  teal: 'from-[#14B8A6] to-[#2DD4BF]',
-  orange: 'from-[#F97316] to-[#FB923C]',
-  amber: 'from-[#F59E0B] to-[#FBBF24]',
-  red: 'from-[#EF4444] to-[#F87171]',
-  pink: 'from-[#EC4899] to-[#F472B6]',
-  indigo: 'from-[#6366F1] to-[#818CF8]',
+  primary: 'bg-gradient-clay-primary',
+  lavender: 'bg-gradient-clay-lavender',
+  mint: 'bg-gradient-clay-mint',
+  pink: 'bg-gradient-clay-pink',
+  peach: 'bg-gradient-clay-peach',
+  sky: 'bg-gradient-clay-sky',
+  coral: 'bg-gradient-clay-coral',
+  amber: 'bg-gradient-clay-amber',
+  teal: 'bg-gradient-clay-teal',
 };
 
 const TILE_SIZES: Record<TileSize, { tile: string; icon: string }> = {
@@ -47,9 +41,9 @@ const TILE_SIZES: Record<TileSize, { tile: string; icon: string }> = {
 };
 
 /**
- * GradientIconTile Component
- * Authoritative visual accent container from design-system/universal-travel-wallet.md (Section 4.1).
- * Encapsulates small icon containers with curated linear-gradient backgrounds.
+ * GradientIconTile — puffy clay gradient icon container.
+ * Implements design-system/universal-travel-wallet.md Section 4.1.
+ * Pastel/matte gradients only, dual-tone clay shadow, deterministic role assignment.
  */
 export function GradientIconTile({
   icon,
@@ -63,7 +57,7 @@ export function GradientIconTile({
   return (
     <div
       className={clsx(
-        'relative inline-flex items-center justify-center shrink-0 bg-gradient-to-br border border-white/20 shadow-sm text-white transition-transform active:scale-95',
+        'relative inline-flex items-center justify-center shrink-0 text-white shadow-clay-convex-sm transition-transform active:scale-95',
         gradientClass,
         sizeConfig.tile,
         className

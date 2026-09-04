@@ -70,3 +70,25 @@ This file tracks key architectural, design, and technical decisions made during 
 - **Consequences:**
   - `main` remains clean and immutable as the reference foundation.
   - Live production code is cleanly isolated on `production` and updated only when feature branches pass full test/typecheck verification.
+
+---
+
+### ADR 005: Soft Tactile UI (Claymorphism · Skeuomorphism · Neumorphism) Supersedes Liquid Glass
+
+- **Date:** 2026-09-04
+- **Status:** Accepted
+- **Context:** ADR 001 established dark-first **Liquid Glass** (translucent surfaces, backdrop blur, luminous borders, blue/cyan accent) as the authoritative material system. The user explicitly rejected this direction — no glass, no blur, no neon lighting — and requested a full material and color system replacement based on three supplied references: a Claymorphism finance app (light mode target), a Neumorphic monochrome widget screen, and a Neumorphic dark music player (dark mode target). The new direction keeps Motion (Framer Motion), adds GSAP and parallax as explicit first-class animation tools, and moves the accent family from blue/cyan to violet/purple, with a dark-purple night canvas and a white day canvas.
+- **Decision:**
+  1. Replace the Liquid Glass Material System in `design-system/universal-travel-wallet.md` (former Sections 5–6) with a **Soft Tactile Material System** blending Claymorphism (day mode default: solid, matte, puffy shapes with a light highlight + hue-tinted soft shadow), Neumorphism (night mode default: surfaces close in color to the canvas, distinguished only by a soft dual-tone shadow), and Skeuomorphism (the umbrella principle — controls look and behave like physical, pressable objects; convex at rest, concave/inset when pressed).
+  2. Every surface becomes fully **opaque** — no `backdrop-filter`, no blur, no translucency, and nothing shows through a surface. Depth comes entirely from dual-tone box-shadows (a light highlight edge + a darker, theme-tinted shadow edge), never from opacity.
+  3. Replace the blue/cyan accent family (`#4DA3FF`) with a violet/purple accent family (`#7C6FEF` day / `#9B8CFF` night). Background canvases become `#15101F`→`#0F0B18` (dark purple, night) and `#FFFFFF`→`#F1EDFC` (white with a soft lavender wash, day) — both rendered as a **soft linear gradient**, never a radial glow field.
+  4. Explicitly forbid neon, glowing, or fluorescent color anywhere in the product (previously only "avoid bright neon glows as decoration" under the glass Don'ts — now a hard rule with zero exceptions).
+  5. Retain the Custom Gradient Accent Pattern (`GradientIconTile`) from ADR 001, but re-render it as a puffy clay tile with a dual-tone shadow instead of a flat gradient on a glass surface, and restrict its palette to pastel/matte stops (no neon-saturated gradients).
+  6. Retain Motion (Framer Motion) as the primary component-animation library; formally add **GSAP** (`gsap.context()`-scoped, for scroll-orchestrated sequences) and **parallax** (used sparingly for depth cues) as first-class, complementary animation tools alongside it — none of these three are being removed or replaced by this ADR.
+  7. Corner radii increase slightly across the board (e.g. `radius-lg` 20px → 24px, `radius-sheet` 28px → 32px) to suit the puffier clay/neumorphic geometry.
+  8. Cross-reference updates: `.ai/PROJECT_KNOWLEDGE.md` Point 99 and Section 10, and `.ai/RULES/04-UI-UX-AND-MOTION.md` Rules 41/73/74, are updated to remove "Liquid Glass" as the mandated material and point to this ADR instead, so the frozen documentation set no longer contradicts itself.
+- **Consequences:**
+  - No component built going forward may use `backdrop-filter`, translucent `rgba` surfaces, or glow/neon effects; any such code from before this ADR (there is none currently implemented — the codebase was reset to the Phase 1 baseline before this change) must not be reintroduced.
+  - `GlassCard`/`GlassButton`-style naming is retired in favor of theme-aware `SoftCard`/`SoftButton` components that render their clay or neumorphic variant from the active theme, not as separate components.
+  - Financial readability is, if anything, easier to guarantee under this ADR than under ADR 001, since opaque surfaces remove the contrast risk that translucency/blur always carried.
+  - This ADR does not touch anything outside the visual material/color system — architecture (ADR 003), git strategy (ADR 004), and UI/UX Pro Max governance (ADR 002) are unaffected.

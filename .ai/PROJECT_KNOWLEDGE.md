@@ -365,7 +365,8 @@ Combine currency activity across Exchanges, Expenses (where relevant), and Final
 
 ### Point 29: Fast Negotiation & Currency Calculator
 Dedicated fast shopping/bargaining/cash utility.
-- **Goal Flow:** Hear price → Enter → Understand → Negotiate → Offer → Buy → Optionally add expense.
+- **Standalone Mode:** Users can launch the calculator without creating or opening a trip. In this mode, the user manually selects the Base and Target currencies.
+- **Goal Flow:** Hear price → Enter → Understand → Negotiate → Offer → Buy → Optionally add expense (if linked to a trip).
 - Auto-fetches exchange rates when online (cached locally).
 - When offline: Uses most recent cached rate, allows manual rate override.
 - No API dependency for operation.
@@ -764,9 +765,9 @@ Primary system is shadcn/ui + Base UI + Tailwind CSS. Do NOT mix MUI, Ant Design
 
 ### Point 99: Final UI/UX & Architecture Standard
 Universal Travel Wallet must feel like a **Premium Mobile Travel-Money Application** featuring:
-- Premium Apple Liquid Glass-inspired visual language
+- Soft Tactile UI visual language — Claymorphism (day mode) / Neumorphism (night mode), Skeuomorphic press feedback, zero glass/blur/neon (see ADR 005 in `.ai/DECISIONS.md`)
 - Mobile-first UX and app-like interaction
-- Motion-powered animation layer
+- Motion, GSAP & parallax-powered animation layer
 - shadcn/ui + Base UI accessible UI foundation
 - Tailwind CSS styling system
 - Lucide React icon system
@@ -799,8 +800,8 @@ Page/component implementation
 
 ### Key Visual Rules:
 - **Authoritative Source:** `design-system/universal-travel-wallet.md` is the primary visual specification. Supporting tools (like UI/UX Pro Max) act as intelligence helpers and must NEVER override or replace this design system.
-- **Liquid Glass Surface Material:** Primary surface/material language (`GlassCard`, `GlassButton`, translucent background, thin borders).
-- **Custom Gradient Accent Pattern:** Curated linear gradient backgrounds used for small icon containers (`GradientIconTile`), category icons, wallet icons, card leading anchors, and quick-action icons. Gradients belong exclusively to the content/accent layer, leaving surrounding UI surfaces, body copy, and financial values calm and readable.
+- **Soft Tactile Surface Material (ADR 005, supersedes the original Liquid Glass mandate):** Primary surface/material language is opaque Claymorphism (day mode) / Neumorphism (night mode) with Skeuomorphic press feedback — `SoftCard`, `SoftButton`, soft dual-tone shadows, zero blur/translucency/neon.
+- **Custom Gradient Accent Pattern:** Curated pastel linear gradients rendered as puffy clay tiles for small icon containers (`GradientIconTile`), category icons, wallet icons, card leading anchors, and quick-action icons. Gradients belong exclusively to the content/accent layer, leaving surrounding UI surfaces, body copy, and financial values calm and readable.
 - **Deterministic Gradient Assignment:** Gradients are selected from centralized tokens with semantic or deterministic mapping, avoiding random per-render color changes.
 - **Financial Readability Priority:** Financial numbers must remain solid, high-contrast, tabular text (`tabular-nums`). Gradients or visual effects must never obscure monetary data.
 

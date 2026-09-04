@@ -2,34 +2,209 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Night mode (dark obsidian #0c0d11, Neumorphism) — default. design-system §3. */
 :root {
-  --background: #050506;
-  --background-secondary: #0B0B0D;
-  --surface: rgba(255, 255, 255, 0.055);
-  --surface-strong: rgba(255, 255, 255, 0.085);
-  --surface-subtle: rgba(255, 255, 255, 0.035);
-  --surface-solid: #151518;
-  --border: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.18);
-  --accent-primary: #4DA3FF;
-  --accent-strong: #68B4FF;
-  --accent-soft: rgba(77, 163, 255, 0.16);
-  --text-primary: #F5F5F7;
-  --text-secondary: #B8B8BE;
-  --text-muted: #7E7E86;
-  --text-disabled: #55555C;
+  --background: #0c0d11;
+  --background-secondary: #12141a;
+  --background-gradient: linear-gradient(175deg, #0c0d11 0%, #12141a 50%, #0c0d11 100%);
+  --surface: #0c0d11;
+  --surface-strong: #141721;
+  --surface-subtle: #090a0d;
+  --surface-solid: #0f1117;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --shadow-highlight: rgba(255, 255, 255, 0.05);
+  --shadow-shadow: rgba(0, 0, 0, 0.65);
+  --accent-primary: #9b8cff;
+  --accent-strong: #b4a7ff;
+  --accent-soft: rgba(155, 140, 255, 0.16);
+  --text-primary: #f1edfb;
+  --text-secondary: #b9afd1;
+  --text-muted: #8377a0;
+  --text-disabled: #5b5270;
+}
+
+/* Day mode (clean light, Claymorphism). Toggle via .light on <html>. design-system §3. */
+.light {
+  --background: #ffffff;
+  --background-secondary: #f8fafc;
+  --background-gradient: linear-gradient(175deg, #ffffff 0%, #f8faff 50%, #eef2ff 100%);
+  --surface: #ffffff;
+  --surface-strong: #f8fafc;
+  --surface-subtle: #f1f5f9;
+  --surface-solid: #ffffff;
+  --border: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.16);
+  --shadow-highlight: rgba(255, 255, 255, 1);
+  --shadow-shadow: rgba(99, 102, 241, 0.12);
+  --accent-primary: #4f46e5;
+  --accent-strong: #4338ca;
+  --accent-soft: rgba(79, 70, 229, 0.1);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-disabled: #94a3b8;
 }
 
 body {
-  background-color: var(--background);
+  background: var(--background-gradient);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
   min-height: 100vh;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
-/* Tabular numerals for financial values (Section 8) */
+/* Tabular numerals for financial values (design-system §8) */
 .financial-num {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
+
+/* Soft Tactile shadow primitives (design-system §5) — convex (raised) default */
+.shadow-clay-convex {
+  box-shadow:
+    -8px -8px 16px var(--shadow-highlight),
+    10px 10px 22px var(--shadow-shadow);
+}
+
+.shadow-clay-convex-sm {
+  box-shadow:
+    -4px -4px 10px var(--shadow-highlight),
+    6px 6px 14px var(--shadow-shadow);
+}
+
+.shadow-clay-elevated {
+  box-shadow:
+    -10px -10px 22px var(--shadow-highlight),
+    14px 14px 30px var(--shadow-shadow);
+}
+
+.shadow-clay-floating {
+  box-shadow:
+    -12px -12px 28px var(--shadow-highlight),
+    18px 18px 40px var(--shadow-shadow);
+}
+
+/* Inset/concave — inputs and pressed states (design-system §5, §14) */
+.shadow-clay-concave {
+  box-shadow:
+    inset 4px 4px 10px var(--shadow-shadow),
+    inset -4px -4px 10px var(--shadow-highlight);
+}
+
+/* Skeuomorphic press feedback: convex -> concave on tap */
+.press-convex-concave {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.press-convex-concave:active {
+  box-shadow:
+    inset 3px 3px 8px var(--shadow-shadow),
+    inset -3px -3px 8px var(--shadow-highlight);
+  transform: scale(0.99);
+}
+
+html.page-revealed body {
+  overflow-x: clip;
+}
+
+/* Theme-aware hero scenic banner — night image by default, day image in
+   light mode. Faded into the page background at the top edge so it blends
+   rather than cutting off hard (design-system §7: content over chrome). */
+.hero-scenic-night {
+  background-image: url('/hero-scenic-night.jpg');
+}
+.hero-scenic-day {
+  display: none;
+}
+.light .hero-scenic-night {
+  display: none;
+}
+.light .hero-scenic-day {
+  display: block;
+  background-image: url('/hero-scenic-day.jpg');
+}
+.hero-scenic-fade {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
+}
+
+/* Animated gradient border for every SoftCard (design-system §16). A single
+   comet of the theme's own accent colors sweeps continuously around the
+   border — themed to the brand's violet family rather than a rainbow, so it
+   stays consistent with ADR 005 (no neon, controlled semantic color). */
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.animated-gradient-border {
+  --card-fill: var(--surface);
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--card-fill), var(--card-fill)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      transparent 0deg,
+      var(--accent-primary) 50deg,
+      var(--accent-strong) 95deg,
+      transparent 150deg,
+      transparent 360deg
+    ) border-box;
+  animation: border-angle-spin 6s linear infinite;
+}
+
+@keyframes border-angle-spin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient-border {
+    animation: none;
+    --border-angle: 20deg;
+  }
+}
+
+/* 3D and Parallax Utilities */
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Flight dotted path animation */
+@keyframes flight-dash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.animate-flight-path {
+  stroke-dasharray: 6 6;
+  animation: flight-dash 1.6s linear infinite;
+}
+
+/* Floating animation */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+

@@ -4,12 +4,12 @@
 
 ---
 
-### [USER-DEFINED RULE] Rule 41: Liquid Glass Does Not Override Usability
-The application's visual style should be premium and Apple Liquid Glass-inspired. However:
+### [USER-DEFINED RULE] Rule 41: Soft Tactile UI Does Not Override Usability
+The application's visual style should be premium and tactile — Claymorphism (day mode) / Neumorphism (night mode) with Skeuomorphic press feedback, per `design-system/universal-travel-wallet.md` Section 5 and ADR 005. However:
 
 `READABILITY` > `ACCESSIBILITY` > `USABILITY` > `PERFORMANCE` > `VISUAL EFFECTS`
 
-Do not sacrifice functionality for glass effects.
+Do not sacrifice functionality for soft-shadow/clay effects. This rule previously named "Liquid Glass"; that material system was superseded in full by ADR 005 — no blur, no translucency, no neon anywhere in the product.
 
 ---
 
@@ -53,8 +53,8 @@ The authoritative visual design foundation is specified in [design-system/univer
    UI/UX Pro Max serves only as supporting design intelligence and must NEVER replace or override the authoritative design system.
 2. **Custom Gradient Accent Pattern:**  
    - Use reusable `GradientIcon` / `GradientIconTile` concepts for card icons, wallet icons, expense icons, transaction icons, category icons, quick actions, status/feature indicators, empty/success states.
-   - Pattern composition: `[gradient icon]` + `calm readable content surface`.
-   - Gradients belong exclusively to the content/accent identity layer. Liquid Glass remains the primary material/surface language.
+   - Pattern composition: `[clay gradient icon]` + `calm readable content surface`.
+   - Gradients belong exclusively to the content/accent identity layer. The Soft Tactile (Claymorphism/Neumorphism) material from ADR 005 remains the primary material/surface language — Liquid Glass was fully superseded, not this pattern.
    - Do NOT turn cards, buttons, inputs, text, or background canvases into random gradient surfaces. Large gradient surfaces require deliberate semantic justification (e.g. physical credit card visuals).
 3. **Deterministic Gradient Tokens:**  
    - All gradients must originate from centralized design tokens (`gradient.primary`, `gradient.blue`, `gradient.cyan`, `gradient.magenta`, `gradient.green`, etc.).
@@ -75,5 +75,5 @@ UI/UX Pro Max is integrated as a supporting design intelligence tool.
    - Querying `--domain icons` for Lucide React accessibility patterns.
 2. **Prohibited Scope:**  
    - NEVER run commands with `--persist` or generate a competing `MASTER.md` file.
-   - NEVER override the color tokens, typography, spacing, radius, Liquid Glass materials, or gradient icon tiles defined in `design-system/universal-travel-wallet.md`.
+   - NEVER override the color tokens, typography, spacing, radius, Soft Tactile (Claymorphism/Neumorphism) materials, or gradient icon tiles defined in `design-system/universal-travel-wallet.md`.
    - NEVER alter frozen specification points 0–99.
