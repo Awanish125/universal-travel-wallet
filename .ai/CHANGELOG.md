@@ -4,6 +4,8 @@ All notable changes to the Universal Travel Wallet project knowledge, rules, bas
 
 ## [0.1.0] - 2026-09-04
 ### Added
+- **Phase 1 Baseline Commit:** Initialized Git repository on `main` branch with clean baseline commit `Phase 1: Technical foundation complete` (`36ed174c93246968ac4d5ca7cd07d09cb6a0e6f9`).
+- **Tailored `.gitignore`:** Configured exclusions for `node_modules/`, `.next/`, `*.tsbuildinfo`, `.env*`, build artifacts, and system files while preserving persistent project documentation (`.ai/`, `design-system/`, `AGENTS.md`).
 - **Phase 1 Technical Foundation & Architecture:** Next.js App Router, React 18, TypeScript, Tailwind CSS project setup optimized for Vercel deployment.
 - **Single Source of Financial Truth (`src/domain/financial/`):**
   - Encapsulated `Money` Value Object wrapping `bignumber.js` arithmetic.
