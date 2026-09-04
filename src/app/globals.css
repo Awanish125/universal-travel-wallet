@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #050506;
+  --background-secondary: #0B0B0D;
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-strong: rgba(255, 255, 255, 0.085);
+  --surface-subtle: rgba(255, 255, 255, 0.035);
+  --surface-solid: #151518;
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --accent-primary: #4DA3FF;
+  --accent-strong: #68B4FF;
+  --accent-soft: rgba(77, 163, 255, 0.16);
+  --text-primary: #F5F5F7;
+  --text-secondary: #B8B8BE;
+  --text-muted: #7E7E86;
+  --text-disabled: #55555C;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Tabular numerals for financial values (Section 8) */
+.financial-num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
