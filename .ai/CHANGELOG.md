@@ -25,6 +25,11 @@ All notable changes to the Universal Travel Wallet project knowledge, rules, bas
 
 ## [Unreleased]
 ### Added
+- **Responsive Multi-Device & Desktop Transformation (Points 86 & 87):**
+  - Upgraded `BottomNav` to render as a fixed bottom navigation bar on mobile (`< md`), and transform into a top navigation bar with brand logo and quick links on desktop (`≥ md`).
+  - Converted Trip Dashboard (`/trips/[id]`) into a responsive 3-column desktop grid split (`lg:grid-cols-3 gap-6`).
+  - Expanded Trips Page (`/trips`) grid layout for tablet and desktop (`sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`).
+  - Redesigned Standalone Calculator (`/calculator`) with side-by-side currency input cards on desktop (`md:grid-cols-2`).
 - **Per-Trip Dashboard Graphs & Verification (Point 73 & 52):**
   - Built `MiniAnalyticsCard` embedding a dynamic Category Spending Donut Chart preview directly on the main Trip Dashboard for every trip.
   - Added unit test suite `backup-service.test.ts` verifying IndexedDB data persistence, full JSON export, and data restoration. Verified **52 out of 52 unit tests passing**.
