@@ -146,7 +146,13 @@ export function HeroContent() {
     >
       <div
         data-hero-item
-        className="mb-6 inline-flex items-center gap-2 self-center rounded-full border border-accent/25 bg-accent-soft px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent"
+        style={
+          {
+            '--card-fill': 'var(--surface-strong)',
+            '--border-spin-duration': '5s',
+          } as React.CSSProperties
+        }
+        className="animated-gradient-border mb-6 inline-flex items-center gap-2 self-center rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent"
       >
         <span className="h-2 w-2 rounded-full bg-accent" />
         <ScrambleText text="Your travel companion" duration={1} trigger="immediate" />

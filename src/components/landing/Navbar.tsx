@@ -62,7 +62,7 @@ export function Navbar() {
             <span className="text-base font-bold tracking-tight text-text-primary">
               Travel Wallet
             </span>
-            <span className="text-[11px] font-medium tracking-wide text-text-secondary opacity-80">
+            <span className="hidden text-[11px] font-medium tracking-wide text-text-secondary opacity-80 sm:block">
               Any Currency, Anywhere.
             </span>
           </div>
@@ -91,7 +91,7 @@ export function Navbar() {
             href="/trips/new"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
-            className="btn-soft btn-soft-primary inline-flex min-h-[44px] items-center px-5 text-xs font-bold sm:text-sm"
+            className="btn-soft btn-soft-primary inline-flex min-h-[44px] items-center whitespace-nowrap px-3.5 text-xs font-bold sm:px-5 sm:text-sm"
           >
             Get started
           </motion.a>

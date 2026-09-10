@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { clsx } from 'clsx';
 import {
   motion,
@@ -70,6 +70,26 @@ export function SoftCard({
   const rootRef = useRef<HTMLDivElement>(null);
   const [showAmbience, setShowAmbience] = useState(false);
 
+  // Every card shares the same 6s sweep with no stagger of its own (unlike
+  // the landing page's pills/stats panel, which set a per-instance
+  // `--border-spin-duration`). Left alone, cards that mount together — e.g.
+  // two stacked on a form — animate perfectly in phase, so their bright
+  // arcs land on the same edge at the same moment and read as one connected
+  // border instead of two separate cards. A small per-instance negative
+  // delay desyncs them without a visible jump or restart.
+  //
+  // `Math.random()` has to run only on the client: the server has no way to
+  // agree with the browser on a value, and calling it during the initial
+  // render (e.g. `useState(() => ...)`) makes the server-rendered markup and
+  // the client's first render disagree, which React reports as a hydration
+  // mismatch. Starting at a fixed value and randomizing after mount avoids
+  // that — the sync window before the effect runs is a single frame, not
+  // something a visitor can see.
+  const [borderDelay, setBorderDelay] = useState('0s');
+  useEffect(() => {
+    setBorderDelay(`-${(Math.random() * 6).toFixed(2)}s`);
+  }, []);
+
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
   const spring = { stiffness: 220, damping: 22 };
@@ -134,6 +154,7 @@ export function SoftCard({
       style={
         {
           '--card-fill': CARD_FILL,
+          animationDelay: borderDelay,
           ...(tiltEnabled ? { rotateX, rotateY, transformPerspective: 900 } : null),
           ...style,
         } as React.CSSProperties
@@ -141,8 +162,21 @@ export function SoftCard({
       {...props}
     >
       {showAmbience && <CardAmbience />}
-      {/* Content sits above the ambience layer. */}
-      <div className="relative">{children}</div>
+      {/*
+        `display: contents`, not a real box: `children` becomes direct flex
+        (or grid) items of the card itself, so a caller's own layout classes
+        — `flex flex-col items-center gap-2`, `flex items-center
+        justify-between`, and so on, passed in via `className` above — apply
+        to the content the caller actually wrote, not to a single anonymous
+        wrapper standing in for all of it. A wrapper with a real box (`block`,
+        the default) leaves every card's content in plain document flow
+        instead: two adjacent inline elements run together with no gap, and
+        stacked block children ignore `items-center`/`justify-between`
+        entirely. `position: relative` isn't needed here either — the outer
+        card already establishes that positioning context for the ambience
+        layer beneath.
+      */}
+      <div className="contents">{children}</div>
     </motion.div>
   );
 }

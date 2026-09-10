@@ -25,6 +25,63 @@ All notable changes to the Universal Travel Wallet project knowledge, rules, bas
 
 ## [Unreleased]
 
+### Fixed - 2026-09-10 (SoftCard layout, wallet flow, bottom nav)
+- **`SoftCard`'s `className` layout classes never reached its content.**
+  `children` rendered one DOM level below where a caller's `flex flex-col
+  items-center gap-2` / `flex items-center justify-between` actually applied,
+  leaving every affected card in plain document flow. Visible as the trip
+  dashboard's "Spent so far" label and amount running onto one line, and
+  (confirmed via measurement) wallet-list rows stacking instead of sitting
+  icon-left/balance-right. Fixed with `display: contents` on the inner
+  wrapper so its children become the outer card's real flex items — one fix,
+  ~20 consumers.
+- **Wallet cards were a dead end.** `WalletList` marked them `interactive`
+  (hover/press styling) but wired no `onClick`; there was no way to add or
+  correct money in an existing wallet short of recording a full currency
+  exchange. Added `WalletRepository.adjustBalance()` (Point 9's "Adjust
+  balance", logged as an `ADJUSTMENT` movement) and `WalletDetailSheet` —
+  tapping a wallet now opens Add money / Take money out, shorthand-aware,
+  with an optional note and a delete action.
+- **The exchange screen rejected K/M shorthand.** Amount and fee fields were
+  `type="number"`, which cannot contain letters at all. Switched to
+  `type="text"` and routed every numeric read through `parseShorthandAmount`
+  (Point 30), the same parser the negotiation calculator already used.
+- **The "Your travel companion" badge's border bled across the whole pill.**
+  `--card-fill` was set to `var(--accent-soft)`, a translucent `rgba()` — ADR
+  005 requires opaque surfaces — so the conic-gradient border layer showed
+  through the entire face instead of staying in the ring. Fixed by using
+  `--surface-strong`, matching every other `animated-gradient-border`
+  consumer.
+- **The bottom-nav's inactive icons went briefly invisible.** A first pass at
+  giving the active icon an animated gradient stroke wrote
+  `stroke={active ? 'url(...)' : undefined}` — an explicit `undefined` still
+  sets the prop, overwriting Lucide's own `stroke="currentColor"" default and
+  leaving icons with neither stroke nor fill. Fixed by conditionally
+  spreading the prop instead of assigning `undefined`.
+- **"Get started" wrapped to two lines on 375px phones**, colliding with the
+  theme toggle. The tagline now hides below `sm`; the button is
+  `whitespace-nowrap` with tighter mobile padding.
+- Trip-dashboard header icons (back, charts, report, categories, delete,
+  theme toggle) were flat ghost buttons; restyled onto the existing
+  `.shadow-clay-convex-sm` / `.press-convex-concave` clay primitives.
+
+### Changed - 2026-09-10
+- **Bottom nav is now claymorphic** (ADR 005): rounded top corners,
+  `.shadow-clay-floating`, a clay hairline border, and a raised convex chip
+  for the active tab instead of a flat color patch. The active tab's icon
+  additionally carries a continuously rotating multi-stop violet gradient
+  stroke (`GradientDefs.tsx`, new — an SVG `<linearGradient>` animated via
+  SMIL, the stroke equivalent of `.animated-gradient-border`'s CSS
+  conic-gradient sweep, using the existing `gradient-clay-primary` token per
+  Rule 73). Applied consistently to the desktop header's own active pill.
+- **The exchange screen needs one fewer tap.** When a currency has exactly
+  one matching wallet, "Take it from" / "Put it into" auto-select it instead
+  of requiring the dropdown to be opened to confirm the only option.
+- **The shared dropdown search input** (`SearchableSelect`, used by every
+  currency/wallet/country/category picker) was `text-sm` (14px) — any
+  focused input under 16px triggers iOS/Android's own zoom-to-fit-field
+  behaviour, which read as "the dropdown zooms." Bumped to `text-base`.
+
 ### Fixed - 2026-09-05 (controls, cards and ambience)
 - **Every create action failed off `localhost`.** `crypto.randomUUID()` is only
   defined in a secure context, so opening the app from a phone on the LAN

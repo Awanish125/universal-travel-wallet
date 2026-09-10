@@ -8,6 +8,7 @@ import { Money } from '../financial/money';
 describe('WalletRepository', () => {
   beforeEach(async () => {
     await db.wallets.clear();
+    await db.walletMovements.clear();
   });
 
   const createSampleWallet = (id: string, tripId: string = 'trip-1') => {
@@ -58,5 +59,41 @@ describe('WalletRepository', () => {
     await walletRepository.delete('wallet-1');
     retrieved = await walletRepository.findById('wallet-1');
     expect(retrieved).toBeNull();
+  });
+
+  describe('adjustBalance', () => {
+    it('adds money and logs an ADJUSTMENT movement', async () => {
+      await walletRepository.save(createSampleWallet('wallet-1'));
+
+      await walletRepository.adjustBalance(
+        'wallet-1',
+        Money.fromDecimal('100', 'USD'),
+        'Found cash'
+      );
+
+      const wallet = await walletRepository.findById('wallet-1');
+      expect(wallet?.balance.toDecimalString()).toBe('600.5');
+
+      const movements = await db.walletMovements.where('walletId').equals('wallet-1').toArray();
+      expect(movements).toHaveLength(1);
+      expect(movements[0].type).toBe('ADJUSTMENT');
+      expect(movements[0].amount).toBe('100');
+      expect(movements[0].note).toBe('Found cash');
+    });
+
+    it('removes money with a negative amount', async () => {
+      await walletRepository.save(createSampleWallet('wallet-1'));
+
+      await walletRepository.adjustBalance('wallet-1', Money.fromDecimal('-50', 'USD'));
+
+      const wallet = await walletRepository.findById('wallet-1');
+      expect(wallet?.balance.toDecimalString()).toBe('450.5');
+    });
+
+    it('throws for a wallet that does not exist', async () => {
+      await expect(
+        walletRepository.adjustBalance('missing', Money.fromDecimal('10', 'USD'))
+      ).rejects.toThrow();
+    });
   });
 });

@@ -21,6 +21,7 @@ import { tripRepository } from '../../../../infrastructure/repositories/trip-rep
 import { exchangeRepository } from '../../../../infrastructure/repositories/exchange-repository';
 import { Exchange } from '../../../../domain/entities/exchange';
 import { Money, getCurrencyDecimals } from '../../../../domain/financial/money';
+import { parseShorthandAmount } from '../../../../domain/financial/shorthand';
 import { CompositeRateManager } from '../../../../infrastructure/rates/composite-manager';
 import { OpenCurrencyProvider } from '../../../../infrastructure/rates/open-currency-provider';
 import { WalletMapper } from '../../../../infrastructure/mappers/wallet-mapper';
@@ -35,16 +36,19 @@ import { newId } from '../../../../lib/id';
 
 const rateManager = new CompositeRateManager(new OpenCurrencyProvider());
 
+// Shorthand-aware: "100K" and "1.5M" (Point 30) are valid amounts here too,
+// not just in the negotiation calculator.
+const isPositiveShorthandAmount = (val: string) => {
+  const parsed = Number(parseShorthandAmount(val));
+  return !isNaN(parsed) && parsed > 0;
+};
+
 const exchangeSchema = z.object({
-  givenAmount: z
-    .string()
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Enter an amount above zero'),
+  givenAmount: z.string().refine(isPositiveShorthandAmount, 'Enter an amount above zero'),
   givenCurrency: z.string().length(3),
   givenWalletId: z.string().optional(),
 
-  receivedAmount: z
-    .string()
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'Enter an amount above zero'),
+  receivedAmount: z.string().refine(isPositiveShorthandAmount, 'Enter an amount above zero'),
   receivedCurrency: z.string().length(3),
   receivedWalletId: z.string().optional(),
 
@@ -144,7 +148,7 @@ export default function RecordExchangePage({ params }: { params: { id: string } 
   // needs no extra tap. It only auto-fills until the user edits it themselves.
   useEffect(() => {
     if (receivedTouchedRef.current || !marketRate || !receivedCurrency) return;
-    const numericGiven = Number(givenAmount);
+    const numericGiven = Number(parseShorthandAmount(givenAmount || ''));
     if (!numericGiven) {
       setValue('receivedAmount', '');
       return;
@@ -163,8 +167,31 @@ export default function RecordExchangePage({ params }: { params: { id: string } 
     [wallets, receivedCurrency]
   );
 
-  const numericGiven = Number(givenAmount) || 0;
-  const numericReceived = Number(receivedAmount) || 0;
+  // Less entry (Rule 66): when there is only one wallet in a currency, that
+  // is obviously the one the traveller means — pick it instead of making
+  // them open "Take it from" / "Put it into" to confirm the only option.
+  // Applied once per currency so a deliberate "Not from a wallet" (clearing
+  // it back to empty) sticks instead of being silently reapplied.
+  const givenWalletAutoFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!givenCurrency || givenWalletAutoFor.current === givenCurrency) return;
+    givenWalletAutoFor.current = givenCurrency;
+    if (!getValues('givenWalletId') && givenWallets.length === 1) {
+      setValue('givenWalletId', givenWallets[0].id);
+    }
+  }, [givenCurrency, givenWallets, getValues, setValue]);
+
+  const receivedWalletAutoFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!receivedCurrency || receivedWalletAutoFor.current === receivedCurrency) return;
+    receivedWalletAutoFor.current = receivedCurrency;
+    if (!getValues('receivedWalletId') && receivedWallets.length === 1) {
+      setValue('receivedWalletId', receivedWallets[0].id);
+    }
+  }, [receivedCurrency, receivedWallets, getValues, setValue]);
+
+  const numericGiven = Number(parseShorthandAmount(givenAmount || '')) || 0;
+  const numericReceived = Number(parseShorthandAmount(receivedAmount || '')) || 0;
   const actualRate = numericGiven > 0 ? (numericReceived / numericGiven).toFixed(4) : '0';
   const expectedReceived = marketRate ? numericGiven * marketRate : 0;
   const gainLoss = marketRate ? numericReceived - expectedReceived : 0;
@@ -194,9 +221,18 @@ export default function RecordExchangePage({ params }: { params: { id: string } 
   const onSubmit = async (data: ExchangeFormValues) => {
     setSaveError(null);
     try {
-      const givenMoney = Money.fromDecimal(data.givenAmount, data.givenCurrency);
-      const receivedMoney = Money.fromDecimal(data.receivedAmount, data.receivedCurrency);
-      const feeMoney = Money.fromDecimal(data.fee || '0', data.givenCurrency);
+      const givenMoney = Money.fromDecimal(
+        parseShorthandAmount(data.givenAmount),
+        data.givenCurrency
+      );
+      const receivedMoney = Money.fromDecimal(
+        parseShorthandAmount(data.receivedAmount),
+        data.receivedCurrency
+      );
+      const feeMoney = Money.fromDecimal(
+        parseShorthandAmount(data.fee || '0'),
+        data.givenCurrency
+      );
       const receivedDecimals = getCurrencyDecimals(data.receivedCurrency);
 
       const exchange = new Exchange({
@@ -286,16 +322,22 @@ export default function RecordExchangePage({ params }: { params: { id: string } 
                 </span>
                 <input
                   id="given-amount"
-                  type="number"
+                  type="text"
                   inputMode="decimal"
-                  step="any"
                   {...register('givenAmount')}
-                  placeholder="0.00"
+                  placeholder="0 or 100K"
                   className="financial-num w-full bg-transparent text-3xl font-black text-foreground outline-none placeholder:text-muted-foreground/40"
                 />
               </div>
-              {errors.givenAmount && (
+              {errors.givenAmount ? (
                 <p className="mt-1 text-xs text-destructive">{errors.givenAmount.message}</p>
+              ) : (
+                /[a-zA-Z]/.test(givenAmount || '') &&
+                numericGiven > 0 && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    = {formatAmount(numericGiven, givenCurrency || 'USD')}
+                  </p>
+                )
               )}
             </div>
 
@@ -371,20 +413,24 @@ export default function RecordExchangePage({ params }: { params: { id: string } 
                 </span>
                 <input
                   id="received-amount"
-                  type="number"
+                  type="text"
                   inputMode="decimal"
-                  step="any"
                   {...register('receivedAmount', {
                     onChange: () => {
                       receivedTouchedRef.current = true;
                     },
                   })}
-                  placeholder="0.00"
+                  placeholder="0 or 100K"
                   className="financial-num w-full bg-transparent text-3xl font-black text-foreground outline-none placeholder:text-muted-foreground/40"
                 />
               </div>
               {errors.receivedAmount && (
                 <p className="mt-1 text-xs text-destructive">{errors.receivedAmount.message}</p>
+              )}
+              {/[a-zA-Z]/.test(receivedAmount || '') && numericReceived > 0 && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  = {formatAmount(numericReceived, receivedCurrency || 'USD')}
+                </p>
               )}
               <p className="mt-1 text-xs text-muted-foreground">
                 {isRateLoading
@@ -540,11 +586,10 @@ export default function RecordExchangePage({ params }: { params: { id: string } 
               </label>
               <input
                 id="exchange-fee"
-                type="number"
+                type="text"
                 inputMode="decimal"
-                step="any"
                 {...register('fee')}
-                placeholder="0.00"
+                placeholder="0 or 5K"
                 className={`financial-num ${inputClasses}`}
               />
             </div>

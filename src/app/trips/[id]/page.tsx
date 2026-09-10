@@ -99,11 +99,11 @@ export default function TripDashboardPage({ params }: { params: { id: string } }
               type="button"
               onClick={() => router.push('/trips')}
               aria-label="Back to all trips"
-              className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface-strong"
+              className="press-convex-concave flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-surface-strong text-foreground shadow-clay-convex-sm transition-colors hover:border-white/20"
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft className="h-5 w-5" />
             </button>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <HeaderAction
                 icon={BarChart3}
                 label="Charts"
@@ -282,11 +282,13 @@ function HeaderAction({
       onClick={onClick}
       title={label}
       aria-label={label}
-      className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface-strong ${
-        destructive ? 'text-destructive' : 'text-muted-foreground hover:text-foreground'
+      className={`press-convex-concave flex h-11 w-11 items-center justify-center rounded-full border bg-surface-strong shadow-clay-convex-sm transition-colors ${
+        destructive
+          ? 'border-destructive/20 text-destructive hover:border-destructive/40'
+          : 'border-white/10 text-muted-foreground hover:border-white/20 hover:text-foreground'
       }`}
     >
-      <Icon className="h-5 w-5" />
+      <Icon className="h-[18px] w-[18px]" />
     </button>
   );
 }

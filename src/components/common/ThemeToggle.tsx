@@ -35,15 +35,16 @@ export function ThemeToggle() {
 
   return (
     <motion.button
-      whileTap={{ scale: 0.9, rotate: 15 }}
+      whileTap={{ scale: 0.92, rotate: 15 }}
       onClick={toggleTheme}
-      className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors cursor-pointer"
+      className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-surface-strong text-foreground shadow-clay-convex-sm transition-colors hover:border-white/20 cursor-pointer"
       title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+      aria-label={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
     >
       {theme === 'light' ? (
-        <Sun className="w-5 h-5 text-amber-500" />
+        <Sun className="w-[18px] h-[18px] text-amber-500" />
       ) : (
-        <Moon className="w-5 h-5 text-blue-400" />
+        <Moon className="w-[18px] h-[18px] text-blue-400" />
       )}
     </motion.button>
   );

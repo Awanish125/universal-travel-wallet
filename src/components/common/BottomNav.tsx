@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Calculator, Globe, Home, Plane, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ThemeToggle } from './ThemeToggle';
+import { GradientDefs } from './GradientDefs';
 
 const NAV_ITEMS = [
   { label: 'Home', path: '/', icon: Home },
@@ -39,9 +40,11 @@ export function BottomNav() {
 
   return (
     <>
+      <GradientDefs />
+
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface-strong px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-10px_28px_-20px_rgba(0,0,0,0.9)] print:hidden md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 rounded-t-xl border-t border-white/10 bg-surface-strong px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 shadow-clay-floating print:hidden md:hidden"
       >
         <ul className="mx-auto flex max-w-md items-center justify-around">
           {NAV_ITEMS.map((item) => {
@@ -54,19 +57,29 @@ export function BottomNav() {
                   type="button"
                   onClick={() => router.push(item.path)}
                   aria-current={active ? 'page' : undefined}
-                  className="relative flex min-h-[52px] min-w-[64px] select-none flex-col items-center justify-center gap-0.5 rounded-2xl px-3"
+                  className="press-convex-concave relative flex min-h-[52px] min-w-[64px] select-none flex-col items-center justify-center gap-0.5 rounded-2xl px-3"
                 >
                   {active && (
                     <motion.span
                       layoutId="mobileNavIndicator"
-                      className="absolute inset-0 -z-10 rounded-2xl bg-accent-soft"
+                      className="absolute inset-0 -z-10 rounded-2xl border border-white/10 bg-accent-soft shadow-clay-convex-sm"
                       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                     />
                   )}
                   <Icon
                     className={`h-5 w-5 transition-colors ${
-                      active ? 'text-brand-accent' : 'text-muted-foreground'
+                      active ? '' : 'text-muted-foreground'
                     }`}
+                    // The animated gradient replaces the flat accent color
+                    // only on the active tab. Lucide forwards `stroke`
+                    // straight onto the <svg>, overriding its own default of
+                    // `stroke="currentColor"` — so the prop has to be left
+                    // out entirely when inactive, not passed as `undefined`.
+                    // `stroke={undefined}` still sets the key, wiping out
+                    // Lucide's own default and leaving the icon with no
+                    // stroke paint at all (invisible, since these icons have
+                    // no fill either).
+                    {...(active ? { stroke: 'url(#icon-gradient-violet)' } : null)}
                   />
                   <span
                     className={`text-[10px] font-bold tracking-tight transition-colors ${
@@ -127,10 +140,13 @@ export function BottomNav() {
                     <motion.span
                       layoutId="desktopNavIndicator"
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                      className="absolute inset-0 -z-10 rounded-xl bg-accent-soft shadow-[inset_0_0_0_1px_var(--accent-soft)]"
+                      className="absolute inset-0 -z-10 rounded-xl border border-white/10 bg-accent-soft shadow-clay-convex-sm"
                     />
                   )}
-                  <Icon className="h-4 w-4" />
+                  <Icon
+                    className="h-4 w-4"
+                    {...(active ? { stroke: 'url(#icon-gradient-violet)' } : null)}
+                  />
                   <span>{item.label}</span>
                 </button>
               );

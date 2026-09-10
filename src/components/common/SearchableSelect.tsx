@@ -225,7 +225,12 @@ export function SearchableSelect({
                 onKeyDown={handleSearchKeyDown}
                 placeholder={searchPlaceholder}
                 aria-label={label ? `Search ${label}` : 'Search options'}
-                className="w-full bg-transparent py-1 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                // 16px is the line iOS/Android draw for "leave this input
+                // alone" — anything smaller and the browser zooms the whole
+                // page in to fit it on focus, which read as the dropdown
+                // itself zooming. `text-base` here, `text-sm` everywhere
+                // else this input's row uses it, is the fix.
+                className="w-full bg-transparent py-1 text-base text-foreground outline-none placeholder:text-muted-foreground"
               />
               {query && (
                 <button
