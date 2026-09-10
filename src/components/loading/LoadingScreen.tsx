@@ -11,8 +11,10 @@ import './loading.css';
 
 /**
  * Brand-matched loading screen: a door-split reveal (adapted from the KP
- * reference build) re-themed to Universal Travel Wallet's violet/purple
- * Soft Tactile brand — no blue/orange, no neon, single accent family.
+ * reference build) re-themed to Universal Travel Wallet's Soft Tactile brand:
+ * the graphite canvas of ADR 009 with the violet accent as the only colour.
+ * Colours come from the theme tokens, so the loader can never drift away from
+ * the page it opens onto.
  */
 export function LoadingScreen() {
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -41,7 +43,7 @@ export function LoadingScreen() {
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        background: '#0f0b18',
+        background: 'var(--background)',
         overflow: 'hidden',
         contain: 'layout paint',
       }}

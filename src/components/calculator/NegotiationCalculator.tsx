@@ -14,9 +14,21 @@ import { ThemeToggle } from '../common/ThemeToggle';
 interface Props {
   baseCurrency: string;
   targetCurrency: string;
+  /** Reopens the currency setup sheet. */
+  onChangeCurrencies?: () => void;
+  /** Lets the page persist a swap, so the choice survives to the next visit. */
+  onCurrenciesSwapped?: (home: string, local: string) => void;
+  /** Turns the negotiated price into a trip expense (Point 40). */
+  onAddToExpense?: (finalPrice: number, currency: string) => void;
 }
 
-export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
+export function NegotiationCalculator({
+  baseCurrency,
+  targetCurrency,
+  onChangeCurrencies,
+  onCurrenciesSwapped,
+  onAddToExpense,
+}: Props) {
   const calc = useNegotiationCalculator(baseCurrency, targetCurrency);
   const [isEditingRate, setIsEditingRate] = useState(false);
   const [manualRateInput, setManualRateInput] = useState('');
@@ -38,11 +50,11 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
   };
 
   const swapCurrencies = () => {
-    // Keep the rate consistent conceptually, but swap base/target
     const newBase = calc.targetCurrency;
     const newTarget = calc.baseCurrency;
     calc.setBaseCurrency(newBase);
     calc.setTargetCurrency(newTarget);
+    onCurrenciesSwapped?.(newBase, newTarget);
   };
 
   const [isCashCounterOpen, setIsCashCounterOpen] = useState(false);
@@ -57,10 +69,24 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
       />
 
       {/* Header with Rate Display */}
-      <header className="p-4 flex flex-col gap-3 bg-background/90 sticky top-0 z-10 shadow-sm">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-extrabold tracking-tight">Calculator</h1>
-          <ThemeToggle />
+      <header className="sticky top-0 z-10 flex flex-col gap-3 border-b border-border bg-background p-4">
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="text-xl font-extrabold tracking-tight text-foreground">
+            Bargaining calculator
+          </h1>
+          <div className="flex items-center gap-1">
+            {onChangeCurrencies && (
+              <SoftButton
+                variant="ghost"
+                size="sm"
+                onClick={onChangeCurrencies}
+                className="text-brand-accent"
+              >
+                Change money
+              </SoftButton>
+            )}
+            <ThemeToggle />
+          </div>
         </div>
         
         {isEditingRate ? (
@@ -100,7 +126,7 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
           <SoftCard className="p-5 relative overflow-hidden flex flex-col gap-1 border border-border hover:border-brand-accent/30 transition-colors focus-within:border-brand-accent/50 focus-within:ring-2 focus-within:ring-brand-accent/10">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
-                {calc.targetCurrency} (Foreign)
+                {calc.targetCurrency} — price you hear
               </span>
             </div>
             <input
@@ -130,7 +156,7 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
           <SoftCard className="p-5 relative overflow-hidden flex flex-col gap-1 border border-border hover:border-brand-accent/30 transition-colors focus-within:border-brand-accent/50 focus-within:ring-2 focus-within:ring-brand-accent/10">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-brand-accent uppercase tracking-wider">
-                {calc.baseCurrency} (Home)
+                {calc.baseCurrency} — what it costs you
               </span>
             </div>
             <input
@@ -152,11 +178,11 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl flex justify-between items-center mt-2"
+            className="mt-2 flex items-center justify-between rounded-2xl border border-success/25 bg-success/10 p-4"
           >
             <div>
-              <p className="text-emerald-600 dark:text-emerald-400 font-bold text-sm">Discount Applied (-{calc.discountPercentage}%)</p>
-              <p className="text-emerald-700 dark:text-emerald-300 font-medium text-xs">
+              <p className="text-sm font-bold text-success">Discount Applied (-{calc.discountPercentage}%)</p>
+              <p className="text-xs font-medium text-success">
                 Saved {formatCompactNumber(calc.baseSavings)} {calc.baseCurrency}
               </p>
             </div>
@@ -196,16 +222,19 @@ export function NegotiationCalculator({ baseCurrency, targetCurrency }: Props) {
             onClick={() => setIsCashCounterOpen(true)}
           >
             <Banknote className="w-5 h-5 text-foreground" />
-            <span className="font-bold text-base text-foreground">Count Cash</span>
+            <span className="text-base font-bold text-foreground">Count cash</span>
           </SoftButton>
 
           <SoftButton 
             variant="primary"
             className="flex-[2] py-4 shadow-soft-accent flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand-accent/90"
-            onClick={() => alert("Expense adding will be supported when linked to a trip.")}
+            onClick={() =>
+              onAddToExpense?.(calc.targetFullValue.toNumber(), calc.targetCurrency)
+            }
+            disabled={!onAddToExpense || calc.targetFullValue.toNumber() <= 0}
           >
             <Plus className="w-5 h-5 text-white" />
-            <span className="font-bold text-base text-white">Add to Expense</span>
+            <span className="text-base font-bold text-white">Add as expense</span>
           </SoftButton>
         </div>
       </div>

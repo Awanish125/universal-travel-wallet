@@ -16,7 +16,7 @@ export default function CategoriesPage({ params }: { params: { id: string } }) {
       <AddCategoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* Header */}
-      <header className="px-4 py-6 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-border/50">
+      <header className="px-4 py-6 sticky top-0 bg-background z-10 border-b border-border/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button 

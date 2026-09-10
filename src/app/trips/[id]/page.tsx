@@ -2,7 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Wallet as WalletIcon, Repeat2, Calculator, Settings, FileText, BarChart3 } from 'lucide-react';
+import {
+  ArrowLeft,
+  BarChart3,
+  Calculator,
+  FileText,
+  Plus,
+  Repeat2,
+  Tags,
+  Trash2,
+  Wallet as WalletIcon,
+} from 'lucide-react';
 import { tripRepository } from '../../../infrastructure/repositories/trip-repository';
 import { Trip } from '../../../domain/entities/trip';
 import { SoftCard } from '../../../components/common/SoftCard';
@@ -15,10 +25,11 @@ import { ExpenseList } from '../../../components/expenses/ExpenseList';
 import { ParticipantBalancesList } from '../../../components/participants/ParticipantBalancesList';
 import { BudgetProgressCard } from '../../../components/dashboard/BudgetProgressCard';
 import { MiniAnalyticsCard } from '../../../components/dashboard/MiniAnalyticsCard';
+import { DeleteTripDialog } from '../../../components/trips/DeleteTripDialog';
+import { CurrencyAmount } from '../../../components/common/CurrencyAmount';
 import { useTripMetrics } from '../../../hooks/useTripMetrics';
-import { AnimatedNumber } from '../../../components/common/AnimatedNumber';
-
 import { ThemeToggle } from '../../../components/common/ThemeToggle';
+import { currencyBadge } from '../../../lib/currency-format';
 
 export default function TripDashboardPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -26,31 +37,34 @@ export default function TripDashboardPage({ params }: { params: { id: string } }
   const [loading, setLoading] = useState(true);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   useEffect(() => {
+    let active = true;
     async function loadTrip() {
       try {
         const data = await tripRepository.findById(params.id);
-        if (data) {
-          setTrip(data);
-        } else {
-          router.replace('/trips');
-        }
+        if (!active) return;
+        if (data) setTrip(data);
+        else router.replace('/trips');
       } catch (err) {
         console.error('Failed to load trip', err);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
     loadTrip();
+    return () => {
+      active = false;
+    };
   }, [params.id, router]);
 
   const metrics = useTripMetrics(trip?.id || '', trip?.baseCurrency || 'USD');
 
   if (loading || metrics.isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground animate-pulse">Loading dashboard...</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="animate-pulse text-muted-foreground">Loading dashboard...</p>
       </div>
     );
   }
@@ -58,185 +72,247 @@ export default function TripDashboardPage({ params }: { params: { id: string } }
   if (!trip) return null;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <CreateWalletModal 
-          tripId={trip.id} 
-          isOpen={isWalletModalOpen} 
+    <div className="min-h-screen bg-background pb-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <CreateWalletModal
+          tripId={trip.id}
+          isOpen={isWalletModalOpen}
           onClose={() => setIsWalletModalOpen(false)}
-          defaultCurrency={trip.baseCurrency}
+          defaultCurrency={trip.localCurrency}
         />
         <AddParticipantModal
           tripId={trip.id}
           isOpen={isParticipantModalOpen}
           onClose={() => setIsParticipantModalOpen(false)}
         />
+        <DeleteTripDialog
+          isOpen={isDeleteOpen}
+          tripId={trip.id}
+          tripName={trip.name}
+          onClose={() => setIsDeleteOpen(false)}
+          onDeleted={() => router.replace('/trips')}
+        />
 
-        {/* Header */}
-        <header className="py-6 border-b border-border/50">
-          <div className="flex items-center justify-between mb-4">
-            <button 
+        <header className="border-b border-border py-5">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <button
+              type="button"
               onClick={() => router.push('/trips')}
-              className="p-2 -ml-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
+              aria-label="Back to all trips"
+              className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface-strong"
             >
-              <ArrowLeft className="w-6 h-6" />
+              <ArrowLeft className="h-6 w-6" />
             </button>
-            <div className="flex gap-2 items-center">
-              <button 
+            <div className="flex items-center gap-1">
+              <HeaderAction
+                icon={BarChart3}
+                label="Charts"
                 onClick={() => router.push(`/trips/${trip.id}/analytics`)}
-                className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors text-brand-accent"
-                title="View Analytics"
-              >
-                <BarChart3 className="w-5 h-5" />
-              </button>
-              <button 
+              />
+              <HeaderAction
+                icon={FileText}
+                label="Report"
                 onClick={() => router.push(`/trips/${trip.id}/summary`)}
-                className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
-                title="View Summary Report"
-              >
-                <FileText className="w-5 h-5" />
-              </button>
-              <div className="md:hidden">
+              />
+              <HeaderAction
+                icon={Tags}
+                label="Categories"
+                onClick={() => router.push(`/trips/${trip.id}/categories`)}
+              />
+              <HeaderAction
+                icon={Trash2}
+                label="Delete trip"
+                destructive
+                onClick={() => setIsDeleteOpen(true)}
+              />
+              <span className="md:hidden">
                 <ThemeToggle />
-              </div>
-              <button 
-                onClick={() => router.push('/settings/backup')}
-                className="p-2 rounded-full text-foreground hover:bg-surface-strong transition-colors"
-                title="Backup & Restore"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
+              </span>
             </div>
           </div>
-          
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-foreground">{trip.name}</h1>
-            <p className="text-sm font-bold text-brand-accent flex items-center gap-1 mt-1">
-              {trip.country} • Base: {trip.baseCurrency}
-            </p>
-          </div>
+
+          <h1 className="text-3xl font-black tracking-tight text-foreground">{trip.name}</h1>
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            <span className="font-bold text-brand-accent">{trip.country}</span>
+            <span aria-hidden>·</span>
+            <span>
+              You count in{' '}
+              <span className="font-bold text-foreground">{currencyBadge(trip.baseCurrency)}</span>
+            </span>
+            <span aria-hidden>·</span>
+            <span>
+              You spend in{' '}
+              <span className="font-bold text-foreground">{currencyBadge(trip.localCurrency)}</span>
+            </span>
+          </p>
         </header>
 
-        {/* Main Content Layout Grid */}
-        <main className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Main Column (2 Cols on Desktop) */}
-          <div className="lg:col-span-2 space-y-6">
-            
-            {/* Main Metric - Total Spent */}
-            <SoftCard className="p-6 flex flex-col items-center justify-center text-center space-y-2 py-8 relative overflow-hidden">
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-accent to-purple-500 opacity-50"></div>
-              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Total Spent</span>
-              <div className="text-4xl sm:text-5xl font-black tracking-tighter text-foreground flex items-center gap-1">
-                <span className="text-2xl text-muted-foreground font-bold">{metrics.totalSpent.currency}</span>
-                <AnimatedNumber 
-                  value={metrics.totalSpent.toNumber()} 
-                  decimals={2}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">{metrics.expenseCount} expenses tracked</p>
+        <main className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            <SoftCard className="relative flex flex-col items-center justify-center gap-2 overflow-hidden py-8 text-center">
+              <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                Spent so far
+              </span>
+              <CurrencyAmount
+                money={metrics.totalSpent}
+                animate
+                className="text-4xl font-black tracking-tighter text-foreground sm:text-5xl"
+                symbolClassName="text-2xl"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {metrics.expenseCount === 0
+                  ? 'No expenses yet'
+                  : `${metrics.expenseCount} expense${metrics.expenseCount === 1 ? '' : 's'} recorded`}
+              </p>
             </SoftCard>
 
-            {/* Quick Actions Grid */}
             <div>
-              <h2 className="text-sm font-bold text-foreground mb-3 px-1 uppercase tracking-wider">Quick Actions</h2>
+              <h2 className="mb-3 px-1 text-sm font-bold uppercase tracking-wider text-foreground">
+                Quick actions
+              </h2>
               <div className="grid grid-cols-4 gap-3">
-                <ActionIcon icon={Plus} label="Expense" color="emerald" onClick={() => router.push(`/trips/${trip.id}/expense`)} />
-                <ActionIcon icon={WalletIcon} label="Wallet" color="blue" onClick={() => setIsWalletModalOpen(true)} />
-                <ActionIcon icon={Repeat2} label="Exchange" color="amber" onClick={() => router.push(`/trips/${trip.id}/exchange`)} />
-                <ActionIcon icon={Calculator} label="Calculate" color="purple" onClick={() => router.push('/calculator')} />
+                <QuickAction
+                  icon={Plus}
+                  label="Expense"
+                  onClick={() => router.push(`/trips/${trip.id}/expense`)}
+                />
+                <QuickAction
+                  icon={Repeat2}
+                  label="Change money"
+                  onClick={() => router.push(`/trips/${trip.id}/exchange`)}
+                />
+                <QuickAction
+                  icon={WalletIcon}
+                  label="Wallet"
+                  onClick={() => setIsWalletModalOpen(true)}
+                />
+                <QuickAction
+                  icon={Calculator}
+                  label="Bargain"
+                  onClick={() => router.push('/calculator')}
+                />
               </div>
             </div>
 
-            {/* Wallets & Expenses Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SoftCard className="p-5">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base font-bold text-foreground">My Wallets</h3>
-                  <SoftButton 
-                    variant="ghost" 
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-base font-bold text-foreground">My wallets</h3>
+                  <SoftButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setIsWalletModalOpen(true)}
-                    className="text-xs px-2 py-1 h-auto text-brand-accent hover:text-brand-accent"
+                    className="text-brand-accent"
                   >
-                    + Add
+                    <Plus className="h-3.5 w-3.5" />
+                    Add
                   </SoftButton>
                 </div>
                 <WalletList tripId={trip.id} />
               </SoftCard>
+
               <SoftCard className="p-5">
-                <h3 className="text-base font-bold text-foreground mb-4">Recent Expenses</h3>
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-base font-bold text-foreground">Recent expenses</h3>
+                  <SoftButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => router.push(`/trips/${trip.id}/expense`)}
+                    className="text-brand-accent"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add
+                  </SoftButton>
+                </div>
                 <ExpenseList tripId={trip.id} />
               </SoftCard>
             </div>
-
           </div>
 
-          {/* Sidebar Column (1 Col on Desktop) */}
           <div className="space-y-6">
-            
-            {/* Budget Progress & Alert */}
-            <BudgetProgressCard 
-              tripId={trip.id} 
-              baseCurrency={trip.baseCurrency} 
-              totalSpent={metrics.totalSpent} 
+            <BudgetProgressCard
+              tripId={trip.id}
+              baseCurrency={trip.baseCurrency}
+              totalSpent={metrics.totalSpent}
             />
 
-            {/* Dynamic Category Spending Donut Preview */}
-            <MiniAnalyticsCard 
-              tripId={trip.id} 
-              baseCurrency={trip.baseCurrency} 
-            />
+            <MiniAnalyticsCard tripId={trip.id} baseCurrency={trip.baseCurrency} />
 
-            {/* Participants Section */}
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-base font-bold text-foreground">Companions</h3>
-                <SoftButton 
-                  variant="ghost" 
+            <SoftCard className="p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-base font-bold text-foreground">Who&apos;s with you</h3>
+                <SoftButton
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsParticipantModalOpen(true)}
-                  className="text-xs px-2 py-1 h-auto text-brand-accent hover:text-brand-accent"
+                  className="text-brand-accent"
                 >
-                  + Add
+                  <Plus className="h-3.5 w-3.5" />
+                  Add
                 </SoftButton>
               </div>
               <ParticipantList tripId={trip.id} />
-            </div>
-
-            {/* Group Balances */}
-            <SoftCard className="p-5">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-base font-bold text-foreground">Who owes whom?</h3>
-              </div>
-              <ParticipantBalancesList tripId={trip.id} baseCurrency={trip.baseCurrency} />
             </SoftCard>
 
+            <SoftCard className="p-5">
+              <h3 className="mb-4 text-base font-bold text-foreground">Who owes whom</h3>
+              <ParticipantBalancesList tripId={trip.id} baseCurrency={trip.baseCurrency} />
+            </SoftCard>
           </div>
-
         </main>
       </div>
     </div>
   );
 }
 
-function ActionIcon({ icon: Icon, label, color, onClick }: { icon: any, label: string, color: string, onClick: () => void }) {
-  // Map our requested color to actual Tailwind classes for the clay effect
-  const colorMap: Record<string, string> = {
-    emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    blue: 'bg-blue-50 text-blue-600 border-blue-100',
-    amber: 'bg-amber-50 text-amber-600 border-amber-100',
-    purple: 'bg-purple-50 text-purple-600 border-purple-100',
-  };
+function HeaderAction({
+  icon: Icon,
+  label,
+  onClick,
+  destructive = false,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+  destructive?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className={`flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface-strong ${
+        destructive ? 'text-destructive' : 'text-muted-foreground hover:text-foreground'
+      }`}
+    >
+      <Icon className="h-5 w-5" />
+    </button>
+  );
+}
 
-  // Simplified version since GradientIconTile is complex, we just use a nice button
+function QuickAction({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+}) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <SoftButton 
+      <SoftButton
+        variant="secondary"
         onClick={onClick}
-        className="w-14 h-14 rounded-2xl flex items-center justify-center p-0"
+        aria-label={label}
+        className="h-14 w-14 rounded-2xl p-0"
       >
-        <Icon className="w-6 h-6" />
+        <Icon className="h-6 w-6" />
       </SoftButton>
-      <span className="text-[11px] font-semibold text-muted-foreground">{label}</span>
+      <span className="text-center text-[11px] font-semibold leading-tight text-muted-foreground">
+        {label}
+      </span>
     </div>
   );
 }

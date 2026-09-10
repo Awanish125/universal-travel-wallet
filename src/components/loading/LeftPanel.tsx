@@ -19,7 +19,7 @@ const LeftPanel = forwardRef<HTMLDivElement>(function LeftPanel(_, ref) {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(120deg, rgba(155,140,255,0.16) 0%, transparent 70%)',
+          background: 'linear-gradient(120deg, rgba(155,140,255,0.10) 0%, transparent 70%)',
         }}
       />
     </div>

@@ -1,7 +1,9 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
+  // The theme is night-first: `.light` on <html> switches to day mode, so the
+  // dark variant means "html does NOT carry .light".
+  darkMode: ["selector", "html:not(.light)"],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -29,18 +31,47 @@ const config: Config = {
           strong: "var(--accent-strong)",
           soft: "var(--accent-soft)",
         },
-        semantic: {
-          success: "#6FCF97",
-          warning: "#F5B971",
-          danger: "#F2777A",
-          info: "#8FA6FF",
+        // Alias of `accent`, kept because screens refer to the accent as the
+        // brand accent. Both names resolve to the same token.
+        brand: {
+          accent: "var(--accent-primary)",
+          strong: "var(--accent-strong)",
         },
+        semantic: {
+          success: "var(--success)",
+          warning: "var(--warning)",
+          danger: "var(--danger)",
+          info: "var(--info)",
+        },
+        // Shorthand text roles used across app screens.
+        foreground: "var(--text-primary)",
+        muted: {
+          DEFAULT: "var(--surface-subtle)",
+          foreground: "var(--text-muted)",
+        },
+        destructive: {
+          DEFAULT: "var(--danger)",
+          foreground: "#ffffff",
+        },
+        success: "var(--success)",
+        warning: "var(--warning)",
         text: {
           primary: "var(--text-primary)",
           secondary: "var(--text-secondary)",
           muted: "var(--text-muted)",
           disabled: "var(--text-disabled)",
         },
+      },
+      boxShadow: {
+        // Soft Tactile primitives (ADR 005 / design-system §5) exposed as
+        // Tailwind utilities so screens can use them without bespoke CSS.
+        "soft-outer":
+          "-8px -8px 16px var(--shadow-highlight), 10px 10px 22px var(--shadow-shadow)",
+        "soft-outer-sm":
+          "-4px -4px 10px var(--shadow-highlight), 6px 6px 14px var(--shadow-shadow)",
+        "soft-inner":
+          "inset 4px 4px 10px var(--shadow-shadow), inset -4px -4px 10px var(--shadow-highlight)",
+        "soft-accent": "0 10px 24px -8px var(--accent-shadow)",
       },
       backgroundImage: {
         "gradient-clay-primary": "linear-gradient(135deg, #9B8CFF 0%, #7C6FEF 55%, #5B4FE0 100%)",
@@ -63,7 +94,14 @@ const config: Config = {
         pill: "9999px",
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "system-ui", "-apple-system", "sans-serif"],
+        sans: [
+          "var(--font-geist-sans, ui-sans-serif)",
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
       },
     },
   },

@@ -3,6 +3,7 @@ import { db } from '../db/dexie-db';
 import { ExpenseMapper } from '../mappers/expense-mapper';
 import { Money } from '../../domain/financial/money';
 import { WalletMapper } from '../mappers/wallet-mapper';
+import { newId } from '../../lib/id';
 
 export class ExpenseRepository {
   /**
@@ -35,7 +36,7 @@ export class ExpenseRepository {
 
           // 3. Log Wallet Movement
           await db.walletMovements.put({
-            id: crypto.randomUUID(),
+            id: newId(),
             tripId: expense.tripId,
             walletId: wallet.id,
             amount: expense.originalAmount.toDecimalString(),

@@ -1,5 +1,44 @@
 import { db } from '../../infrastructure/db/dexie-db';
 
+/** Everything belonging to one trip, in one JSON document. */
+export interface TripExport {
+  version: number;
+  kind: 'trip';
+  exportedAt: string;
+  trip: unknown;
+  participants: unknown[];
+  expenses: unknown[];
+  wallets: unknown[];
+  walletMovements: unknown[];
+  exchanges: unknown[];
+  settlements: unknown[];
+  budgets: unknown[];
+  negotiations: unknown[];
+  categories: unknown[];
+}
+
+function downloadBlob(contents: string, mimeType: string, filename: string): void {
+  const blob = new Blob([contents], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}
+
+/** Makes a filename safe on every OS. */
+function slugify(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'trip';
+}
+
+function csvCell(value: unknown): string {
+  const text = value === undefined || value === null ? '' : String(value);
+  return '"' + text.replace(/"/g, '""') + '"';
+}
+
 export class BackupService {
   /**
    * Exports the entire IndexedDB database into a formatted JSON string and triggers a browser download.
@@ -73,6 +112,90 @@ export class BackupService {
   /**
    * Imports database tables from a JSON string.
    */
+  /**
+   * Collects every record belonging to one trip. Used before deleting a trip so
+   * the user keeps a restorable copy of what they are about to lose.
+   */
+  static async collectTripData(tripId: string): Promise<TripExport | null> {
+    const trip = await db.trips.get(tripId);
+    if (!trip) return null;
+
+    return {
+      version: 1,
+      kind: 'trip',
+      exportedAt: new Date().toISOString(),
+      trip,
+      participants: await db.participants.where('tripId').equals(tripId).toArray(),
+      expenses: await db.expenses.where('tripId').equals(tripId).toArray(),
+      wallets: await db.wallets.where('tripId').equals(tripId).toArray(),
+      walletMovements: await db.walletMovements.where('tripId').equals(tripId).toArray(),
+      exchanges: await db.exchanges.where('tripId').equals(tripId).toArray(),
+      settlements: await db.settlements.where('tripId').equals(tripId).toArray(),
+      budgets: await db.budgets.where('tripId').equals(tripId).toArray(),
+      negotiations: await db.negotiations.where('tripId').equals(tripId).toArray(),
+      categories: await db.categories.toArray(),
+    };
+  }
+
+  /** Downloads one trip's complete data as JSON. */
+  static async exportTripToJson(tripId: string): Promise<boolean> {
+    const data = await BackupService.collectTripData(tripId);
+    if (!data) return false;
+
+    const name = slugify((data.trip as { name?: string }).name || 'trip');
+    downloadBlob(
+      JSON.stringify(data, null, 2),
+      'application/json',
+      `${name}-backup-${new Date().toISOString().slice(0, 10)}.json`
+    );
+    return true;
+  }
+
+  /** Downloads one trip's expenses as a spreadsheet-friendly CSV. */
+  static async exportTripExpensesToCsv(tripId: string): Promise<boolean> {
+    const data = await BackupService.collectTripData(tripId);
+    if (!data) return false;
+
+    const participants = data.participants as Array<{ id: string; name: string }>;
+    const categories = data.categories as Array<{ id: string; name: string }>;
+    const expenses = data.expenses as Array<Record<string, unknown>>;
+
+    const headers = [
+      'Date',
+      'Category',
+      'Note',
+      'Paid by',
+      'Amount',
+      'Currency',
+      'Home amount',
+      'Home currency',
+      'Exchange rate',
+      'Payment method',
+      'Shared',
+    ];
+
+    const rows = expenses.map((expense) => [
+      expense.date,
+      categories.find((c) => c.id === expense.category)?.name ?? expense.category,
+      expense.note ?? '',
+      participants.find((p) => p.id === expense.payerId)?.name ?? expense.payerId,
+      expense.amount,
+      expense.originalCurrency,
+      expense.baseAmount,
+      expense.baseCurrency,
+      expense.exchangeRate,
+      expense.paymentMethod,
+      expense.isShared ? 'Shared' : 'Personal',
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map(csvCell).join(','))
+      .join(String.fromCharCode(10));
+    const name = slugify((data.trip as { name?: string }).name || 'trip');
+    downloadBlob(csv, 'text/csv', `${name}-expenses-${new Date().toISOString().slice(0, 10)}.csv`);
+    return true;
+  }
+
   static async importFromJson(jsonString: string): Promise<boolean> {
     try {
       const data = JSON.parse(jsonString);

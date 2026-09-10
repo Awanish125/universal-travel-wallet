@@ -5,12 +5,13 @@ import { motion } from 'framer-motion';
 import { Sun, Moon, Menu, X } from 'lucide-react';
 import Image from 'next/image';
 
+// Only sections that actually exist on the page. "Travel Smarter" and "FAQ"
+// used to be listed here and scrolled nowhere.
 const NAV_LINKS = [
-  { label: 'Calculator', href: '/calculator' },
   { label: 'Features', href: '#features' },
   { label: 'How it works', href: '#how-it-works' },
-  { label: 'Travel Smarter', href: '#travel-smarter' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Calculator', href: '/calculator' },
+  { label: 'My trips', href: '/trips' },
 ];
 
 export function Navbar() {
@@ -38,7 +39,7 @@ export function Navbar() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur-md transition-colors"
+      className="sticky top-0 z-50 w-full border-b border-border bg-background transition-colors"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8 lg:px-12">
         {/* Brand Lockup */}
@@ -79,7 +80,7 @@ export function Navbar() {
               className="group relative text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
             >
               {link.label}
-              <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-200 group-hover:w-full" />
+              <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-gradient-clay-primary transition-all duration-200 group-hover:w-full" />
             </motion.a>
           ))}
         </nav>
@@ -87,12 +88,12 @@ export function Navbar() {
         {/* Actions (CTA + Theme Toggle) */}
         <div className="flex items-center gap-3">
           <motion.a
-            href="/trips"
-            whileHover={{ scale: 1.04, boxShadow: '0 0 20px rgba(59, 130, 246, 0.4)' }}
+            href="/trips/new"
+            whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
-            className="rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 px-5 py-2 text-xs font-semibold text-white shadow-md transition-all sm:text-sm"
+            className="btn-soft btn-soft-primary inline-flex min-h-[44px] items-center px-5 text-xs font-bold sm:text-sm"
           >
-            Get Started
+            Get started
           </motion.a>
 
           {/* Theme Toggle Button */}

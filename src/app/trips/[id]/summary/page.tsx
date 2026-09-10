@@ -13,6 +13,7 @@ import { WalletMapper } from '../../../../infrastructure/mappers/wallet-mapper';
 import { Money } from '../../../../domain/financial/money';
 
 import { SoftCard } from '../../../../components/common/SoftCard';
+import { CurrencyAmount } from '../../../../components/common/CurrencyAmount';
 import { SoftButton } from '../../../../components/common/SoftButton';
 
 export default function TripSummaryPage({ params }: { params: { id: string } }) {
@@ -69,7 +70,7 @@ export default function TripSummaryPage({ params }: { params: { id: string } }) 
   return (
     <div className="min-h-screen bg-background pb-20 print:bg-white print:text-black">
       {/* Header (Hidden on print) */}
-      <header className="px-4 py-6 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-border/50 print:hidden">
+      <header className="px-4 py-6 sticky top-0 bg-background z-10 border-b border-border/50 print:hidden">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button 
@@ -94,16 +95,17 @@ export default function TripSummaryPage({ params }: { params: { id: string } }) 
         <SoftCard className="p-6 text-center space-y-2 border-t-4 border-t-brand-accent">
           <h2 className="text-3xl font-black tracking-tight text-foreground">{trip.name}</h2>
           <p className="text-sm text-brand-accent font-bold">
-            {trip.country} • {trip.startDate} to {trip.endDate} ({days} days)
+            {trip.country} • {trip.startDate} to {trip.endDate} ({days}{' '}
+            {days === 1 ? 'day' : 'days'})
           </p>
           <div className="pt-4 flex justify-center gap-8 border-t border-border/40 mt-4">
             <div>
               <span className="text-xs text-muted-foreground block font-medium">Total Spent</span>
-              <span className="text-2xl font-black text-foreground">{totalSpent.format()}</span>
+              <CurrencyAmount money={totalSpent} className="text-2xl font-black text-foreground" />
             </div>
             <div>
               <span className="text-xs text-muted-foreground block font-medium">Daily Average</span>
-              <span className="text-2xl font-black text-foreground">{dailyAverage.format()}</span>
+              <CurrencyAmount money={dailyAverage} className="text-2xl font-black text-foreground" />
             </div>
           </div>
         </SoftCard>
@@ -112,15 +114,17 @@ export default function TripSummaryPage({ params }: { params: { id: string } }) 
         {budget && (
           <SoftCard className="p-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isWithinBudget ? 'bg-emerald-100 text-emerald-600' : 'bg-destructive/10 text-destructive'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isWithinBudget ? 'bg-success/15 text-success' : 'bg-destructive/10 text-destructive'}`}>
                 <Award className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-foreground">Budget Performance</h3>
-                <p className="text-xs text-muted-foreground">Target: {budget.format()}</p>
+                <p className="text-xs text-muted-foreground">
+                  Target: <CurrencyAmount money={budget} />
+                </p>
               </div>
             </div>
-            <span className={`text-sm font-black ${isWithinBudget ? 'text-emerald-600' : 'text-destructive'}`}>
+            <span className={`text-sm font-black ${isWithinBudget ? 'text-success' : 'text-destructive'}`}>
               {isWithinBudget ? 'Under Budget' : 'Over Budget'}
             </span>
           </SoftCard>
@@ -139,7 +143,7 @@ export default function TripSummaryPage({ params }: { params: { id: string } }) 
                 <div key={catId} className="flex justify-between items-center text-sm">
                   <span className="font-medium text-foreground">{category?.name || 'Other'}</span>
                   <div className="text-right">
-                    <span className="font-bold text-foreground">{amount.format()}</span>
+                    <CurrencyAmount money={amount} className="font-bold text-foreground" />
                     <span className="text-xs text-muted-foreground ml-2">({percentage}%)</span>
                   </div>
                 </div>
@@ -157,7 +161,7 @@ export default function TripSummaryPage({ params }: { params: { id: string } }) 
             {wallets.map(w => (
               <div key={w.id} className="flex justify-between items-center text-sm">
                 <span className="font-medium text-foreground">{w.name} ({w.type})</span>
-                <span className="font-black text-foreground">{w.balance.format()}</span>
+                <CurrencyAmount money={w.balance} className="font-black text-foreground" />
               </div>
             ))}
           </div>

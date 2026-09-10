@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ServiceWorkerRegistration } from '../components/providers/ServiceWorkerRegistration';
+import { AppDataProvider } from '../components/providers/AppDataProvider';
 import { SmoothScrollProvider } from '../components/providers/SmoothScrollProvider';
 import { LoadingScreen } from '../components/loading';
 
@@ -27,9 +28,14 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="antialiased bg-background text-text-primary min-h-screen">
         <ServiceWorkerRegistration />
+        <AppDataProvider />
         <OfflineBadge />
         <LoadingScreen />
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        {/* Room for the fixed mobile navigation bar, applied once here rather
+            than repeated (and forgotten) on every page. */}
+        <div className="pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0">
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        </div>
         <BottomNav />
       </body>
     </html>

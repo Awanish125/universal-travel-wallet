@@ -39,7 +39,7 @@ export function OfflineBadge() {
           exit={{ opacity: 0, y: -20 }}
           className="fixed top-2 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
         >
-          <div className="bg-amber-500 text-slate-950 px-4 py-1.5 rounded-full shadow-lg font-extrabold text-xs flex items-center gap-1.5 backdrop-blur-md">
+          <div className="bg-amber-500 text-slate-950 px-4 py-1.5 rounded-full shadow-lg font-extrabold text-xs flex items-center gap-1.5">
             <WifiOff className="w-3.5 h-3.5" />
             <span>Offline Mode • Using Cached Rates</span>
           </div>
@@ -53,7 +53,7 @@ export function OfflineBadge() {
           exit={{ opacity: 0, y: -20 }}
           className="fixed top-2 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
         >
-          <div className="bg-emerald-500 text-white px-4 py-1.5 rounded-full shadow-lg font-extrabold text-xs flex items-center gap-1.5 backdrop-blur-md">
+          <div className="bg-emerald-500 text-white px-4 py-1.5 rounded-full shadow-lg font-extrabold text-xs flex items-center gap-1.5">
             <Wifi className="w-3.5 h-3.5" />
             <span>Back Online • Live Rates Active</span>
           </div>

@@ -1,19 +1,46 @@
 'use client';
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { X } from 'lucide-react';
+import * as Icons from 'lucide-react';
 import { categoryRepository } from '../../infrastructure/repositories/category-repository';
 import { Category } from '../../domain/entities/category';
-import { SoftCard } from '../common/SoftCard';
+import { Sheet } from '../common/Sheet';
 import { SoftButton } from '../common/SoftButton';
+import { SearchableSelect } from '../common/SearchableSelect';
+import { newId } from '../../lib/id';
+
+/**
+ * A curated set of Lucide icons offered as a picker. Typing a Lucide component
+ * name from memory — what the previous form asked for — is not something a
+ * traveller can be expected to do.
+ */
+const ICON_CHOICES = [
+  'Utensils', 'Coffee', 'Wine', 'ShoppingBag', 'ShoppingCart', 'Car', 'Bike', 'Bus',
+  'Plane', 'Train', 'BedDouble', 'Ticket', 'Umbrella', 'Waves', 'Mountain', 'Camera',
+  'Music', 'Gift', 'Heart', 'Flower2', 'Wifi', 'Phone', 'BadgeCheck', 'HandCoins',
+  'Siren', 'Fuel', 'Dumbbell', 'Baby', 'PawPrint', 'Star', 'MoreHorizontal',
+];
+
+const COLOR_CHOICES = [
+  { value: 'indigo', label: 'Indigo' },
+  { value: 'violet', label: 'Violet' },
+  { value: 'sky', label: 'Sky' },
+  { value: 'teal', label: 'Teal' },
+  { value: 'emerald', label: 'Emerald' },
+  { value: 'lime', label: 'Lime' },
+  { value: 'amber', label: 'Amber' },
+  { value: 'orange', label: 'Orange' },
+  { value: 'rose', label: 'Rose' },
+  { value: 'pink', label: 'Pink' },
+];
 
 const categorySchema = z.object({
-  name: z.string().min(1, 'Name is required').max(30),
-  icon: z.string().min(1, 'Icon name is required'),
-  color: z.string().min(1, 'Color is required'),
+  name: z.string().min(1, 'Enter a name').max(30),
+  icon: z.string().min(1, 'Pick an icon'),
+  color: z.string().min(1, 'Pick a colour'),
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -21,20 +48,32 @@ type CategoryFormValues = z.infer<typeof categorySchema>;
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  /** Prefills the name — used when the user typed it into a picker's search. */
+  initialName?: string;
+  /** Receives the new category's id so the caller can select it right away. */
+  onCreated?: (categoryId: string, name: string) => void;
 }
 
-export function AddCategoryModal({ isOpen, onClose }: Props) {
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<CategoryFormValues>({
+export function AddCategoryModal({ isOpen, onClose, initialName = '', onCreated }: Props) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
-    defaultValues: { name: '', icon: 'Star', color: 'indigo' }
+    defaultValues: { name: initialName, icon: 'Star', color: 'indigo' },
   });
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) reset({ name: initialName, icon: 'Star', color: 'indigo' });
+  }, [isOpen, initialName, reset]);
 
   const onSubmit = async (data: CategoryFormValues) => {
     try {
       const newCategory = new Category({
-        id: crypto.randomUUID(),
+        id: newId(),
         name: data.name,
         icon: data.icon,
         color: data.color,
@@ -42,75 +81,86 @@ export function AddCategoryModal({ isOpen, onClose }: Props) {
       });
 
       await categoryRepository.save(newCategory);
-      reset();
+      onCreated?.(newCategory.id, newCategory.name);
+      reset({ name: '', icon: 'Star', color: 'indigo' });
       onClose();
     } catch (err) {
       console.error('Failed to save category:', err);
-      alert('Failed to add category.');
+      window.alert('That category could not be added. Please try again.');
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm sm:p-4">
-      <SoftCard className="w-full sm:max-w-md p-6 rounded-t-3xl sm:rounded-3xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-foreground">Add Custom Category</h2>
-          <button onClick={onClose} className="p-2 bg-muted rounded-full text-muted-foreground hover:text-foreground">
-            <X className="w-5 h-5" />
-          </button>
+    <Sheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title="New category"
+      description="Use it on this and every future trip."
+      footer={
+        <SoftButton
+          type="submit"
+          form="add-category-form"
+          variant="primary"
+          disabled={isSubmitting}
+          className="w-full py-4 text-base"
+        >
+          {isSubmitting ? 'Adding...' : 'Save category'}
+        </SoftButton>
+      }
+    >
+      <form id="add-category-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-1">
+          <label htmlFor="category-name" className="text-sm font-medium text-foreground">
+            Name
+          </label>
+          <input
+            id="category-name"
+            {...register('name')}
+            placeholder="e.g. Scuba diving"
+            aria-invalid={errors.name ? true : undefined}
+            className="field-surface"
+          />
+          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-foreground">Name</label>
-            <input 
-              {...register('name')}
-              placeholder="e.g. Scuba Diving"
-              className="w-full bg-background border-2 border-transparent focus:border-brand-accent rounded-xl p-3 outline-none transition-colors shadow-soft-inner"
+        <Controller
+          name="icon"
+          control={control}
+          render={({ field }) => (
+            <SearchableSelect
+              label="Icon"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.icon?.message}
+              searchPlaceholder="Search icons..."
+              options={ICON_CHOICES.map((iconName) => {
+                const IconComponent = (Icons as Record<string, unknown>)[iconName] as
+                  | React.ComponentType<{ className?: string }>
+                  | undefined;
+                return {
+                  value: iconName,
+                  label: iconName,
+                  leading: IconComponent ? <IconComponent className="h-5 w-5" /> : undefined,
+                };
+              })}
             />
-            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name.message}</p>}
-          </div>
+          )}
+        />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-foreground">Icon (Lucide name)</label>
-              <input 
-                {...register('icon')}
-                placeholder="e.g. Star"
-                className="w-full bg-background border-2 border-transparent focus:border-brand-accent rounded-xl p-3 outline-none transition-colors shadow-soft-inner"
-              />
-              {errors.icon && <p className="text-xs text-destructive mt-1">{errors.icon.message}</p>}
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-foreground">Color (Tailwind)</label>
-              <select 
-                {...register('color')}
-                className="w-full bg-background border-2 border-transparent focus:border-brand-accent rounded-xl p-3 outline-none transition-colors shadow-soft-inner"
-              >
-                <option value="indigo">Indigo</option>
-                <option value="rose">Rose</option>
-                <option value="amber">Amber</option>
-                <option value="emerald">Emerald</option>
-                <option value="sky">Sky</option>
-                <option value="purple">Purple</option>
-              </select>
-              {errors.color && <p className="text-xs text-destructive mt-1">{errors.color.message}</p>}
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <SoftButton 
-              type="submit" 
-              variant="primary"
-              disabled={isSubmitting}
-              className="w-full py-4 text-base font-bold bg-brand-accent shadow-soft-accent"
-            >
-              {isSubmitting ? 'Adding...' : 'Save Category'}
-            </SoftButton>
-          </div>
-        </form>
-      </SoftCard>
-    </div>
+        <Controller
+          name="color"
+          control={control}
+          render={({ field }) => (
+            <SearchableSelect
+              label="Colour"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.color?.message}
+              options={COLOR_CHOICES}
+            />
+          )}
+        />
+      </form>
+    </Sheet>
   );
 }

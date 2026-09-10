@@ -99,7 +99,7 @@ export function HeroVisual({ isLight }: HeroVisualProps) {
             isLight
               ? 'border-slate-200/80 bg-white/70 shadow-[0_20px_50px_rgba(99,102,241,0.12)]'
               : 'border-white/10 bg-[#0c0d11]/80 shadow-[0_25px_60px_rgba(0,0,0,0.7)]'
-          } backdrop-blur-md`}
+          }`}
         >
           {/* Layer 2: Hero Particles (0.10x) */}
           <motion.div style={reducedMotion ? undefined : { x: particlesX, y: particlesY }}>

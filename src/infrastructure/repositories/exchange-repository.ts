@@ -2,6 +2,7 @@ import { Exchange } from '../../domain/entities/exchange';
 import { db } from '../db/dexie-db';
 import { ExchangeMapper } from '../mappers/exchange-mapper';
 import { WalletMapper } from '../mappers/wallet-mapper';
+import { newId } from '../../lib/id';
 
 export class ExchangeRepository {
   /**
@@ -28,7 +29,7 @@ export class ExchangeRepository {
 
           // Log movement
           await db.walletMovements.put({
-            id: crypto.randomUUID(),
+            id: newId(),
             tripId: exchange.tripId,
             walletId: givenWallet.id,
             amount: exchange.givenAmount.toDecimalString(),
@@ -56,7 +57,7 @@ export class ExchangeRepository {
 
           // Log movement
           await db.walletMovements.put({
-            id: crypto.randomUUID(),
+            id: newId(),
             tripId: exchange.tripId,
             walletId: receivedWallet.id,
             amount: exchange.receivedAmount.toDecimalString(),

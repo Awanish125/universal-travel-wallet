@@ -42,7 +42,7 @@ export function CashCounterModal({ targetCurrency, requiredAmount, isOpen, onClo
   const isShort = difference < 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 sm:p-4">
       <SoftCard className="w-full sm:max-w-md max-h-[90vh] flex flex-col p-6 rounded-t-3xl sm:rounded-3xl animate-in slide-in-from-bottom-10">
         
         {/* Header */}

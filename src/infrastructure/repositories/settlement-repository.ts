@@ -2,6 +2,7 @@ import { Settlement } from '../../domain/entities/settlement';
 import { db } from '../db/dexie-db';
 import { SettlementMapper } from '../mappers/settlement-mapper';
 import { WalletMapper } from '../mappers/wallet-mapper';
+import { newId } from '../../lib/id';
 
 export class SettlementRepository {
   /**
@@ -32,7 +33,7 @@ export class SettlementRepository {
 
           // 3. Log Wallet Movement for payer (SETTLEMENT_OUT)
           await db.walletMovements.put({
-            id: crypto.randomUUID(),
+            id: newId(),
             tripId: settlement.tripId,
             walletId: wallet.id,
             amount: settlement.amount.toDecimalString(),

@@ -6,7 +6,10 @@ export interface TripProps {
   country: string;
   startDate: string;
   endDate: string;
+  /** Home currency — the money the traveller thinks in. */
   baseCurrency: string;
+  /** Local currency — the money spent at the destination. */
+  localCurrency?: string;
   additionalCurrencies?: string[];
   budget?: string;
   dailyBudget?: string;
@@ -22,6 +25,7 @@ export class Trip {
   readonly startDate: string;
   readonly endDate: string;
   readonly baseCurrency: string;
+  readonly localCurrency: string;
   readonly additionalCurrencies: string[];
   readonly budget?: string;
   readonly dailyBudget?: string;
@@ -36,6 +40,9 @@ export class Trip {
     this.startDate = props.startDate;
     this.endDate = props.endDate;
     this.baseCurrency = props.baseCurrency.toUpperCase();
+    // Falls back to the home currency so a trip always has a spending
+    // currency, including trips created before this field existed.
+    this.localCurrency = (props.localCurrency || props.baseCurrency).toUpperCase();
     this.additionalCurrencies = (props.additionalCurrencies || []).map((c) => c.toUpperCase());
     this.budget = props.budget;
     this.dailyBudget = props.dailyBudget;

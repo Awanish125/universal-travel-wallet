@@ -7,8 +7,11 @@ import { budgetRepository } from '../../infrastructure/repositories/budget-repos
 import { Budget } from '../../domain/entities/budget';
 import { Money } from '../../domain/financial/money';
 import { SoftCard } from '../common/SoftCard';
+import { CurrencyAmount } from '../common/CurrencyAmount';
+import { formatMoney } from '../../lib/currency-format';
 import { SoftButton } from '../common/SoftButton';
 import { Target, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { newId } from '../../lib/id';
 
 interface Props {
   tripId: string;
@@ -36,7 +39,7 @@ export function BudgetProgressCard({ tripId, baseCurrency, totalSpent }: Props) 
     if (!inputBudget || isNaN(Number(inputBudget)) || Number(inputBudget) <= 0) return;
 
     const budget = new Budget({
-      id: overallBudgetRecord ? overallBudgetRecord.id : crypto.randomUUID(),
+      id: overallBudgetRecord ? overallBudgetRecord.id : newId(),
       tripId,
       categoryId: 'OVERALL',
       amount: Money.fromDecimal(inputBudget, baseCurrency),
@@ -93,7 +96,7 @@ export function BudgetProgressCard({ tripId, baseCurrency, totalSpent }: Props) 
               value={inputBudget}
               onChange={(e) => setInputBudget(e.target.value)}
               placeholder="e.g. 1000"
-              className="flex-1 bg-background border-2 border-transparent focus:border-brand-accent rounded-xl p-2 outline-none text-foreground font-bold shadow-soft-inner"
+              className="field-surface financial-num flex-1 font-bold"
             />
             <SoftButton variant="primary" onClick={handleSaveBudget} className="px-4 text-xs font-bold bg-brand-accent">
               Save
@@ -104,15 +107,17 @@ export function BudgetProgressCard({ tripId, baseCurrency, totalSpent }: Props) 
         <div className="space-y-3">
           <div className="flex justify-between items-end">
             <div>
-              <span className="text-xs text-muted-foreground block font-medium">Spent of {overallBudget.format()}</span>
-              <span className="text-lg font-black text-foreground">{totalSpent.format()}</span>
+              <span className="block text-xs font-medium text-muted-foreground">
+                Spent of {formatMoney(overallBudget)}
+              </span>
+              <CurrencyAmount money={totalSpent} className="text-lg font-black text-foreground" />
             </div>
             <div className="text-right">
               <span className="text-xs text-muted-foreground block font-medium">
                 {isOverBudget ? 'Over by' : 'Remaining'}
               </span>
-              <span className={`text-sm font-black ${isOverBudget ? 'text-destructive' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                {remainingBudget.format()}
+              <span className={`text-sm font-black ${isOverBudget ? 'text-destructive' : 'text-success'}`}>
+                {formatMoney(remainingBudget)}
               </span>
             </div>
           </div>
@@ -127,11 +132,11 @@ export function BudgetProgressCard({ tripId, baseCurrency, totalSpent }: Props) 
 
           {/* Alert Status */}
           {percentSpent > 80 && (
-            <div className={`p-2.5 rounded-xl flex items-center gap-2 text-xs font-bold ${isOverBudget ? 'bg-destructive/10 text-destructive' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'}`}>
+            <div className={`p-2.5 rounded-xl flex items-center gap-2 text-xs font-bold ${isOverBudget ? 'bg-destructive/10 text-destructive' : 'bg-warning/10 text-warning'}`}>
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>
                 {isOverBudget 
-                  ? `Warning! You have exceeded your budget limit by ${totalSpent.subtract(overallBudget).format()}`
+                  ? `You are over budget by ${formatMoney(totalSpent.subtract(overallBudget))}`
                   : `Careful! You have used ${percentSpent}% of your total budget.`}
               </span>
             </div>

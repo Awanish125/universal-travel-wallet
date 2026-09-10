@@ -68,6 +68,19 @@ Users can create and manage trips.
 - Start date
 - End date
 - Base/home currency
+- **Local/spending currency** *(added 2026-09-05 by ADR 006, on explicit user instruction)*
+
+> **AMENDMENT 2026-09-05 (ADR 006).** A trip now carries a second currency — the money spent at
+> the destination — alongside the home currency. It is derived from the country and can be
+> overridden. Existing trips are backfilled by Dexie schema v2 and never left without one.
+>
+> The interface no longer uses the words "base currency" or "target currency". It says
+> *"Money you count in"* (— your home money) and *"Money you'll spend there"*, and shows the
+> currency symbol beside the code (`₹ INR`, `Rp IDR`). The stored field names `baseCurrency` and
+> `localCurrency` are unchanged, so every other frozen point that refers to the base currency
+> still describes the same value.
+>
+> *Previous wording of this list is preserved above — only the sixth line and this note were added.*
 
 **Optional trip information:**
 - Budget
@@ -125,6 +138,14 @@ While creating an expense, the user must be able to add a participant without le
 - **Actions:** Add currencies, Remove currencies, Set base currency, Search currencies, View currency symbol, View currency flag, View currency formatting, Support different decimal rules.
 - A trip can contain multiple currencies.
 - Currency management must be reusable throughout the application.
+
+> **AMENDMENT 2026-09-05 (ADR 006).** Two additions, both required by Point 0's rule that users
+> must not re-enter what the application can derive:
+> 1. **Country drives currency.** Choosing where the user is going selects that country's
+>    currency automatically (Indonesia → IDR, India → INR). Still overridable. The mapping is a
+>    data table covering every country, so no country-specific *logic* is introduced.
+> 2. **Currency choices are remembered globally.** Once chosen anywhere, the home and local
+>    currencies are preselected on every later screen, including the standalone calculator.
 
 ---
 
@@ -366,6 +387,10 @@ Combine currency activity across Exchanges, Expenses (where relevant), and Final
 ### Point 29: Fast Negotiation & Currency Calculator
 Dedicated fast shopping/bargaining/cash utility.
 - **Standalone Mode:** Users can launch the calculator without creating or opening a trip. In this mode, the user manually selects the Base and Target currencies.
+
+> **AMENDMENT 2026-09-05 (ADR 006).** The calculator asks for its two currencies only on first
+> use. Afterwards it reuses the globally remembered choice and offers a "Change money" action to
+> revisit it. The interface calls them *"Money you count in"* and *"Money you'll pay with"*.
 - **Goal Flow:** Hear price → Enter → Understand → Negotiate → Offer → Buy → Optionally add expense (if linked to a trip).
 - Auto-fetches exchange rates when online (cached locally).
 - When offline: Uses most recent cached rate, allows manual rate override.

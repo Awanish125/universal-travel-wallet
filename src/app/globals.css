@@ -2,26 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Night mode (dark obsidian #0c0d11, Neumorphism) — default. design-system §3. */
+/* Night mode — charcoal / graphite, Neumorphism. Default.
+   The canvas is a neutral graphite ramp with no blue or violet cast: the accent
+   family carries the brand, the background stays out of the way. */
 :root {
-  --background: #0c0d11;
-  --background-secondary: #12141a;
-  --background-gradient: linear-gradient(175deg, #0c0d11 0%, #12141a 50%, #0c0d11 100%);
-  --surface: #0c0d11;
-  --surface-strong: #141721;
-  --surface-subtle: #090a0d;
-  --surface-solid: #0f1117;
+  --background: #0e0f10;
+  --background-secondary: #141517;
+  --background-gradient: linear-gradient(175deg, #0e0f10 0%, #141517 52%, #0b0c0d 100%);
+  --surface: #0e0f10;
+  --surface-strong: #191b1d;
+  --surface-subtle: #090a0b;
+  --surface-solid: #131416;
   --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.12);
-  --shadow-highlight: rgba(255, 255, 255, 0.05);
-  --shadow-shadow: rgba(0, 0, 0, 0.65);
+  --border-strong: rgba(255, 255, 255, 0.13);
+  --shadow-highlight: rgba(255, 255, 255, 0.045);
+  --shadow-shadow: rgba(0, 0, 0, 0.72);
   --accent-primary: #9b8cff;
   --accent-strong: #b4a7ff;
   --accent-soft: rgba(155, 140, 255, 0.16);
-  --text-primary: #f1edfb;
-  --text-secondary: #b9afd1;
-  --text-muted: #8377a0;
-  --text-disabled: #5b5270;
+  --text-primary: #f2f3f4;
+  --text-secondary: #b4b7bb;
+  --text-muted: #83878c;
+  --text-disabled: #585c61;
+  --success: #6fcf97;
+  --warning: #f5b971;
+  --danger: #f2777a;
+  --info: #8fa6ff;
+  --accent-shadow: rgba(155, 140, 255, 0.45);
+  --accent-deep: #6f5fe0;
+  --scrollbar-thumb: rgba(155, 140, 255, 0.34);
+  --scrollbar-thumb-hover: rgba(155, 140, 255, 0.6);
 }
 
 /* Day mode (clean light, Claymorphism). Toggle via .light on <html>. design-system §3. */
@@ -44,16 +54,257 @@
   --text-secondary: #475569;
   --text-muted: #64748b;
   --text-disabled: #94a3b8;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #4f46e5;
+  --accent-shadow: rgba(79, 70, 229, 0.35);
+  --accent-deep: #4338ca;
+  --scrollbar-thumb: rgba(79, 70, 229, 0.3);
+  --scrollbar-thumb-hover: rgba(79, 70, 229, 0.55);
 }
 
 body {
   background: var(--background-gradient);
   background-attachment: fixed;
   color: var(--text-primary);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  /* The fallback lives *inside* var(): without it, a missing
+     --font-geist-sans makes the whole declaration invalid at computed-value
+     time and the page drops to the browser default serif rather than to the
+     system sans listed after it. */
+  font-family: var(--font-geist-sans, ui-sans-serif), system-ui, -apple-system,
+    'Segoe UI', Roboto, sans-serif;
   overflow-x: clip;
   min-height: 100vh;
   transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* ── Native control colour scheme ─────────────────────────────────────────
+   Browsers paint the built-in bits of a control — the date picker's calendar
+   button, the number spinners, the caret — from `color-scheme`, not from CSS
+   colour. Without this the calendar icon renders near-black on the graphite
+   canvas and is effectively invisible. Declaring the scheme flips those
+   glyphs to light on the dark theme and back to dark in day mode. */
+:root {
+  color-scheme: dark;
+}
+
+.light {
+  color-scheme: light;
+}
+
+/* ── Scrollbars ───────────────────────────────────────────────────────────
+   A thin, soft track that belongs to the theme rather than the OS. Firefox
+   takes the standard two properties; Chrome and Safari need the WebKit
+   pseudo-elements. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── Form controls ────────────────────────────────────────────────────────
+   Claymorphic fields: the *same* colour as whatever surface they sit on, sunk
+   into it by a dual-tone inset shadow. Depth does the work, not contrast — a
+   darker fill would read as a hole cut in the card rather than as a pressed
+   part of it.
+
+   `--card-fill` is set by SoftCard, and custom properties inherit, so a field
+   inside a card picks up that card's exact colour. Outside a card it falls back
+   to the standard surface. */
+.field-surface {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem;
+  border-radius: 14px;
+  border: none;
+  background: var(--card-fill, var(--surface-strong));
+  color: var(--text-primary);
+  box-shadow:
+    inset 5px 5px 11px var(--shadow-shadow),
+    inset -5px -5px 11px var(--shadow-highlight);
+  outline: none;
+  transition: box-shadow 0.18s ease;
+}
+
+.field-surface::placeholder {
+  color: var(--text-muted);
+}
+
+/* Pressed a little deeper while in use, so an active field reads as engaged. */
+.field-surface:focus,
+.field-surface:focus-visible,
+.field-surface[data-open='true'] {
+  box-shadow:
+    inset 6px 6px 13px var(--shadow-shadow),
+    inset -6px -6px 13px var(--shadow-highlight);
+}
+
+.field-surface[aria-invalid='true'],
+.field-surface[data-invalid='true'] {
+  box-shadow:
+    inset 5px 5px 11px var(--shadow-shadow),
+    inset -5px -5px 11px var(--shadow-highlight),
+    0 0 0 1.5px var(--danger);
+}
+
+.field-surface:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* A focused field wears the card's own sweeping accent border. This is the
+   focus indicator — there is deliberately no solid ring underneath it, which
+   would sit on top of the gradient and hide the sweep. */
+.field-focus-ring {
+  position: relative;
+  border-radius: 16px;
+}
+
+.field-focus-ring::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 16px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0deg,
+    var(--accent-primary) 50deg,
+    var(--accent-strong) 95deg,
+    transparent 150deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.field-focus-ring:focus-within::before,
+.field-focus-ring[data-open='true']::before {
+  opacity: 1;
+  animation: border-angle-spin 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-focus-ring:focus-within::before,
+  .field-focus-ring[data-open='true']::before {
+    animation: none;
+    --border-angle: 20deg;
+  }
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────
+   The same clay as the fields, in relief instead of intaglio: a button is
+   raised out of the surface, a field is pressed into it. Both are the surface
+   colour — no bright fills. Pressing a button sinks it to exactly the field's
+   inset, which is what sells them as one physical system (ADR 005). */
+.btn-soft {
+  border-radius: 14px;
+  border: none;
+  background: var(--card-fill, var(--surface-strong));
+  transition:
+    box-shadow 0.18s ease,
+    color 0.18s ease;
+  box-shadow:
+    -5px -5px 12px var(--shadow-highlight),
+    6px 6px 14px var(--shadow-shadow);
+}
+
+.btn-soft:active:not(:disabled) {
+  box-shadow:
+    inset 5px 5px 11px var(--shadow-shadow),
+    inset -5px -5px 11px var(--shadow-highlight);
+}
+
+/* Primary carries the accent only as a hint: a tinted edge and accent-lit text
+   on hover. The type stays light so the label is the brightest thing on it. */
+.btn-soft-primary {
+  color: var(--text-primary);
+  box-shadow:
+    -5px -5px 12px var(--shadow-highlight),
+    6px 6px 14px var(--shadow-shadow),
+    inset 0 0 0 1.5px var(--accent-soft);
+}
+
+.btn-soft-primary:hover:not(:disabled) {
+  color: var(--accent-strong);
+  box-shadow:
+    -5px -5px 12px var(--shadow-highlight),
+    6px 6px 16px var(--shadow-shadow),
+    inset 0 0 0 1.5px var(--accent-primary);
+}
+
+.btn-soft-primary:active:not(:disabled) {
+  box-shadow:
+    inset 5px 5px 11px var(--shadow-shadow),
+    inset -5px -5px 11px var(--shadow-highlight),
+    inset 0 0 0 1.5px var(--accent-soft);
+}
+
+.btn-soft-secondary {
+  color: var(--text-secondary);
+}
+
+.btn-soft-secondary:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+/* ── Infinity mark ────────────────────────────────────────────────────────
+   A short lit segment chases the path forever. The dash pattern is expressed
+   in path-length units via `pathLength`-free maths: 260 is comfortably longer
+   than the path, so one dash and one gap read as a single travelling spark. */
+.infinity-mark__spark {
+  stroke-dasharray: 34 226;
+  animation: infinity-spark 3.4s linear infinite;
+}
+
+@keyframes infinity-spark {
+  to {
+    stroke-dashoffset: -260;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .infinity-mark__spark {
+    animation: none;
+    stroke-dasharray: none;
+    opacity: 0.85;
+  }
 }
 
 /* Tabular numerals for financial values (design-system §8) */
@@ -109,27 +360,6 @@ html.page-revealed body {
   overflow-x: clip;
 }
 
-/* Theme-aware hero scenic banner — night image by default, day image in
-   light mode. Faded into the page background at the top edge so it blends
-   rather than cutting off hard (design-system §7: content over chrome). */
-.hero-scenic-night {
-  background-image: url('/hero-scenic-night.jpg');
-}
-.hero-scenic-day {
-  display: none;
-}
-.light .hero-scenic-night {
-  display: none;
-}
-.light .hero-scenic-day {
-  display: block;
-  background-image: url('/hero-scenic-day.jpg');
-}
-.hero-scenic-fade {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 60%, black 100%);
-}
-
 /* Animated gradient border for every SoftCard (design-system §16). A single
    comet of the theme's own accent colors sweeps continuously around the
    border — themed to the brand's violet family rather than a rainbow, so it
@@ -142,6 +372,7 @@ html.page-revealed body {
 
 .animated-gradient-border {
   --card-fill: var(--surface);
+  --border-spin-duration: 6s;
   border: 1.5px solid transparent;
   background:
     linear-gradient(var(--card-fill), var(--card-fill)) padding-box,
@@ -153,7 +384,7 @@ html.page-revealed body {
       transparent 150deg,
       transparent 360deg
     ) border-box;
-  animation: border-angle-spin 6s linear infinite;
+  animation: border-angle-spin var(--border-spin-duration) linear infinite;
 }
 
 @keyframes border-angle-spin {

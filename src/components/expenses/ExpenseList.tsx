@@ -8,8 +8,11 @@ import { CategoryMapper } from '../../infrastructure/mappers/category-mapper';
 import { ParticipantMapper } from '../../infrastructure/mappers/participant-mapper';
 import * as Icons from 'lucide-react';
 import { SoftCard } from '../common/SoftCard';
-import { AnimatedNumber } from '../common/AnimatedNumber';
+import { CurrencyAmount } from '../common/CurrencyAmount';
+import { GradientIconTile } from '../common/GradientIconTile';
+import { gradientRoleForCategory } from '../../lib/category-visuals';
 import { StaggerContainer, StaggerItem } from '../common/StaggerContainer';
+
 
 interface Props {
   tripId: string;
@@ -45,35 +48,37 @@ export function ExpenseList({ tripId }: Props) {
           const category = categories.find(c => c.id === expense.category);
           const payer = participants.find(p => p.id === expense.payerId);
           
-          const IconComponent = (category && (Icons as any)[category.icon]) ? (Icons as any)[category.icon] : Icons.Receipt;
-          const color = category?.color || 'gray';
+          const IconComponent =
+            (category && (Icons as Record<string, any>)[category.icon]) || Icons.Receipt;
+          const gradientRole = gradientRoleForCategory(category?.color);
 
           return (
             <StaggerItem key={expense.id}>
               <SoftCard interactive className="p-3 flex items-center justify-between hover:border-brand-accent/20 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-${color}-100 dark:bg-${color}-500/20 text-${color}-600 dark:text-${color}-400`}>
-                    <IconComponent className="w-5 h-5" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">
-                      {category?.name || 'Unknown'} {expense.note ? `- ${expense.note}` : ''}
+                <div className="flex min-w-0 items-center gap-3">
+                  <GradientIconTile icon={<IconComponent />} role={gradientRole} size="md" />
+                  <div className="flex min-w-0 flex-col">
+                    <span className="truncate text-sm font-bold text-foreground">
+                      {category?.name || 'Uncategorised'}
+                      {expense.note ? ` · ${expense.note}` : ''}
                     </span>
-                    <span className="text-xs text-muted-foreground">
-                      Paid by {payer?.name || 'Someone'}
+                    <span className="truncate text-xs text-muted-foreground">
+                      {expense.isShared ? 'Split · ' : ''}Paid by{' '}
+                      {payer?.isUser ? 'you' : payer?.name || 'someone'}
                     </span>
                   </div>
                 </div>
                 
-                <div className="flex flex-col items-end text-right">
-                  <span className="text-sm font-black text-foreground flex items-center gap-1">
-                    <span className="text-xs text-muted-foreground font-bold">{expense.originalAmount.currency}</span>
-                    <AnimatedNumber value={expense.originalAmount.toNumber()} decimals={2} />
-                  </span>
+                <div className="flex shrink-0 flex-col items-end text-right">
+                  <CurrencyAmount
+                    money={expense.originalAmount}
+                    className="text-sm font-black text-foreground"
+                    symbolClassName="text-xs"
+                  />
                   {expense.originalAmount.currency !== expense.baseAmount.currency && (
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <span>≈ {expense.baseAmount.currency}</span>
-                      <AnimatedNumber value={expense.baseAmount.toNumber()} decimals={2} />
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span aria-hidden>≈</span>
+                      <CurrencyAmount money={expense.baseAmount} />
                     </span>
                   )}
                 </div>

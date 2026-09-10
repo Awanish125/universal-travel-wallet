@@ -1,5 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
+import { ScrollReveal } from '../common/ScrollReveal';
 import { Wallet, ArrowLeftRight, Users, PiggyBank, HandCoins, WifiOff } from 'lucide-react';
 import { SoftCard } from '../common/SoftCard';
 import { GradientIconTile, type GradientRole } from '../common/GradientIconTile';
@@ -47,12 +48,10 @@ export function FeatureGrid() {
   return (
     <section id="features" className="px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-28">
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
+        <ScrollReveal
           className="mx-auto mb-10 max-w-2xl text-center sm:mb-14"
+          staggerChildren={false}
+          from="top"
         >
           <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-4xl">
             Everything a trip&apos;s money needs
@@ -60,17 +59,18 @@ export function FeatureGrid() {
           <p className="mt-3 text-sm text-text-secondary sm:text-base">
             One offline-first app, built for travelers who cross currencies and split bills.
           </p>
-        </motion.div>
+        </ScrollReveal>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-          {FEATURES.map((feature, i) => (
+        <ScrollReveal
+          fromCycle={['left', 'bottom', 'right']}
+          distance={40}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6"
+        >
+          {FEATURES.map((feature) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ y: -6, scale: 1.02 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.35, delay: (i % 3) * 0.08 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
             >
               <SoftCard className="flex h-full flex-col gap-3 cursor-pointer">
                 <GradientIconTile icon={feature.icon} role={feature.role} size="lg" />
@@ -79,7 +79,7 @@ export function FeatureGrid() {
               </SoftCard>
             </motion.div>
           ))}
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

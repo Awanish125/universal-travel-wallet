@@ -59,7 +59,7 @@ export default function BackupPage() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="px-4 py-6 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-border/50">
+      <header className="px-4 py-6 sticky top-0 bg-background z-10 border-b border-border/50">
         <div className="flex items-center gap-2">
           <button 
             onClick={() => router.back()}

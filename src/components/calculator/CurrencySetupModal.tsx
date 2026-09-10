@@ -1,49 +1,90 @@
-import React, { useState } from 'react';
-import { SoftCard } from '../common/SoftCard';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { Sheet } from '../common/Sheet';
 import { SoftButton } from '../common/SoftButton';
 import { CurrencySelect } from '../common/CurrencySelect';
+import { CountrySelect } from '../common/CountrySelect';
+import { getCurrencyForCountry } from '../../lib/countries';
 
 interface CurrencySetupModalProps {
   isOpen: boolean;
-  onComplete: (base: string, target: string) => void;
+  initialHome?: string;
+  initialLocal?: string;
+  onComplete: (home: string, local: string) => void;
+  /** Closing on first run leaves the page — see the calculator route. */
+  onClose: () => void;
 }
 
-export function CurrencySetupModal({ isOpen, onComplete }: CurrencySetupModalProps) {
-  const [base, setBase] = useState('USD');
-  const [target, setTarget] = useState('INR');
+/**
+ * Asks the two questions the calculator needs, in the words a traveller uses:
+ * where they are from and where they are. Picking the destination country fills
+ * the local currency in, so the second currency is usually never touched.
+ */
+export function CurrencySetupModal({
+  isOpen,
+  initialHome = '',
+  initialLocal = '',
+  onComplete,
+  onClose,
+}: CurrencySetupModalProps) {
+  const [home, setHome] = useState(initialHome);
+  const [local, setLocal] = useState(initialLocal);
+  const [country, setCountry] = useState('');
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) return;
+    setHome(initialHome);
+    setLocal(initialLocal);
+  }, [isOpen, initialHome, initialLocal]);
+
+  function handleCountryChange(nextCountry: string) {
+    setCountry(nextCountry);
+    const currency = getCurrencyForCountry(nextCountry);
+    if (currency) setLocal(currency);
+  }
+
+  const canContinue = home.length === 3 && local.length === 3;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <SoftCard className="w-full max-w-sm p-6 text-center shadow-2xl">
-        <h2 className="text-xl font-bold text-foreground mb-2">Setup Calculator</h2>
-        <p className="text-sm text-muted-foreground mb-6">
-          Choose your currencies to start negotiating.
-        </p>
-
-        <div className="space-y-4 text-left">
-          <CurrencySelect 
-            label="Base Currency"
-            value={base}
-            onChange={setBase}
-          />
-          
-          <CurrencySelect 
-            label="Target Currency"
-            value={target}
-            onChange={setTarget}
-          />
-        </div>
-
-        <SoftButton 
+    <Sheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Set up your calculator"
+      description="Tell it once — it remembers for next time."
+      footer={
+        <SoftButton
           variant="primary"
-          className="w-full py-3 mt-8 bg-brand-accent shadow-soft-accent font-bold"
-          onClick={() => onComplete(base, target)}
+          disabled={!canContinue}
+          onClick={() => onComplete(home, local)}
+          className="w-full py-4 text-base"
         >
-          Start Negotiating
+          Start bargaining
         </SoftButton>
-      </SoftCard>
-    </div>
+      }
+    >
+      <div className="space-y-4">
+        <CurrencySelect
+          label="Money you count in"
+          hint="— your home money"
+          value={home}
+          onChange={setHome}
+        />
+
+        <CountrySelect
+          label="Where are you shopping?"
+          hint="— fills the local money in"
+          value={country}
+          onChange={handleCountryChange}
+        />
+
+        <CurrencySelect
+          label="Money you'll pay with"
+          hint="— the local money"
+          value={local}
+          onChange={setLocal}
+        />
+      </div>
+    </Sheet>
   );
 }

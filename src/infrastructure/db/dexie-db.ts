@@ -7,6 +7,8 @@ export interface TripRecord {
   startDate: string;
   endDate: string;
   baseCurrency: string;
+  /** Added in schema v2. Older records are backfilled on upgrade. */
+  localCurrency?: string;
   additionalCurrencies?: string[];
   budget?: string;
   dailyBudget?: string;
@@ -203,6 +205,25 @@ export class TravelWalletDexieDB extends Dexie {
       rateCache: 'id, baseCurrency, targetCurrency, timestamp',
       settings: 'key',
     });
+
+    // v2 — trips gained `localCurrency` (the money spent at the destination).
+    // Existing trips are backfilled from their country, falling back to the
+    // home currency, so no trip is left without a spending currency.
+    this.version(2)
+      .stores({
+        trips: 'id, name, status, createdAt',
+      })
+      .upgrade(async (tx) => {
+        const { getCurrencyForCountry } = await import('../../lib/countries');
+        await tx
+          .table<TripRecord, string>('trips')
+          .toCollection()
+          .modify((trip) => {
+            if (trip.localCurrency) return;
+            trip.localCurrency =
+              getCurrencyForCountry(trip.country || '') || trip.baseCurrency;
+          });
+      });
   }
 }
 

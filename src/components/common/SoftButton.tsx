@@ -3,8 +3,9 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import { motion, HTMLMotionProps } from 'framer-motion';
+import { triggerHaptic } from '../../hooks/useHaptics';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface SoftButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
@@ -14,19 +15,49 @@ export interface SoftButtonProps extends Omit<HTMLMotionProps<'button'>, 'childr
   className?: string;
 }
 
+/**
+ * Buttons share the inputs' physical language (ADR 005): convex at rest,
+ * concave when pressed, lit by the accent rather than filled with a flat block
+ * of it. The surfaces live in `globals.css` as `.btn-soft*` so a button and a
+ * field are shaded from the same tokens and can never drift apart.
+ */
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'bg-brand-accent text-white font-bold shadow-soft-accent hover:brightness-105',
-  secondary: 'bg-surface text-foreground font-bold shadow-soft-outer hover:bg-surface-strong',
-  ghost: 'bg-transparent text-muted-foreground shadow-none hover:text-foreground hover:bg-muted/30',
+  primary: 'btn-soft btn-soft-primary font-bold',
+  secondary: 'btn-soft btn-soft-secondary font-bold',
+  ghost:
+    'rounded-xl font-semibold text-muted-foreground transition-colors hover:bg-accent-soft hover:text-brand-accent',
+  // Clay like the rest — the destructive intent is carried by the type colour,
+  // not by a slab of red.
+  danger: 'btn-soft font-bold text-destructive',
 };
 
+/**
+ * Heights are floors, not fixed values, so a caller can add vertical padding
+ * for a taller call-to-action without fighting a `h-*` class.
+ */
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: 'h-9 px-3 text-xs rounded-xl gap-1.5',
-  md: 'h-11 px-4 text-sm rounded-xl gap-2',
-  lg: 'h-13 px-6 text-base rounded-2xl gap-2.5',
+  sm: 'min-h-[36px] px-3 text-xs gap-1.5',
+  md: 'min-h-[44px] px-4 text-sm gap-2',
+  lg: 'min-h-[52px] px-6 text-base gap-2.5',
 };
 
-import { triggerHaptic } from '../../hooks/useHaptics';
+/**
+ * The button's classes, for the cases where the control has to be a link.
+ * A `<Link>` wrapped in a `<button>` is invalid markup and breaks keyboard
+ * activation, so a link that looks like a button wears these instead.
+ */
+export function softButtonClasses(
+  variant: ButtonVariant = 'primary',
+  size: ButtonSize = 'md',
+  className?: string
+): string {
+  return clsx(
+    'inline-flex cursor-pointer select-none items-center justify-center no-underline',
+    VARIANT_CLASSES[variant],
+    SIZE_CLASSES[size],
+    className
+  );
+}
 
 export function SoftButton({
   variant = 'primary',
@@ -34,20 +65,23 @@ export function SoftButton({
   children,
   className,
   onClick,
+  disabled,
   ...props
 }: SoftButtonProps) {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     triggerHaptic(variant === 'primary' ? 'medium' : 'light');
-    if (onClick) onClick(e as any);
+    onClick?.(event);
   };
 
   return (
     <motion.button
-      whileTap={{ scale: 0.96 }}
+      whileTap={disabled ? undefined : { scale: 0.97 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       onClick={handleClick}
+      disabled={disabled}
       className={clsx(
-        'inline-flex items-center justify-center border-0 transition-colors disabled:opacity-50 disabled:pointer-events-none min-h-[44px] cursor-pointer select-none',
+        'inline-flex cursor-pointer select-none items-center justify-center',
+        'disabled:pointer-events-none disabled:opacity-50',
         VARIANT_CLASSES[variant],
         SIZE_CLASSES[size],
         className

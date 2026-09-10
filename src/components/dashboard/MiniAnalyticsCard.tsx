@@ -48,13 +48,13 @@ export function MiniAnalyticsCard({ tripId, baseCurrency }: Props) {
     >
       <div className="flex flex-col space-y-1">
         <div className="flex items-center gap-1.5 text-brand-accent font-bold text-xs uppercase tracking-wider">
-          <PieIcon className="w-4 h-4" /> Category Breakdown
+          <PieIcon className="w-4 h-4" /> Where it went
         </div>
         <span className="text-sm font-black text-foreground">
-          {pieData.length} Categories Tracked
+          {pieData.length} {pieData.length === 1 ? 'category' : 'categories'} so far
         </span>
         <span className="text-xs text-muted-foreground flex items-center gap-1">
-          Tap for detailed analytics <ArrowRight className="w-3 h-3" />
+          See the full breakdown <ArrowRight className="w-3 h-3" />
         </span>
       </div>
 

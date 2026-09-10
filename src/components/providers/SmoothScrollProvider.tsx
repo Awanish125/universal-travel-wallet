@@ -2,9 +2,14 @@
 import { useEffect } from 'react';
 
 /**
- * Lenis smooth scroll bridged into GSAP's ticker/ScrollTrigger so
- * scroll-driven (parallax) animations stay in sync with smooth-scroll
- * position instead of the raw native scroll event.
+ * Lenis smooth scroll, driven from GSAP's ticker so scroll-driven animation and
+ * scroll position advance on the same frame.
+ *
+ * The ScrollTrigger bridge this used to register is gone: no component uses
+ * ScrollTrigger any more. Entrance animations trigger on IntersectionObserver
+ * and the pinned hero reads `window.scrollY` directly on the ticker — see
+ * `src/lib/motion.ts` for the reasoning.
+ *
  * design-system/universal-travel-wallet.md Section 27.
  */
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
@@ -16,23 +21,18 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     let cancelled = false;
 
     (async () => {
-      const [{ default: Lenis }, { default: gsap }, { ScrollTrigger }] = await Promise.all([
+      const [{ default: Lenis }, { default: gsap }] = await Promise.all([
         import('lenis'),
         import('gsap'),
-        import('gsap/ScrollTrigger'),
       ]);
 
       if (cancelled) return;
-
-      gsap.registerPlugin(ScrollTrigger);
 
       lenis = new Lenis({
         duration: 1.1,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
       });
-
-      lenis.on('scroll', ScrollTrigger.update);
 
       tickerFn = (time: number) => {
         lenis?.raf(time * 1000);

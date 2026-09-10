@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 interface Props {
   children: React.ReactNode;
@@ -9,7 +9,7 @@ interface Props {
   staggerDelay?: number;
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: (staggerDelay = 0.06) => ({
     opacity: 1,
@@ -20,14 +20,14 @@ const containerVariants = {
   }),
 };
 
-export const itemVariants = {
+export const itemVariants: Variants = {
   hidden: { opacity: 0, y: 15, scale: 0.97 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 350,
       damping: 25,
     },

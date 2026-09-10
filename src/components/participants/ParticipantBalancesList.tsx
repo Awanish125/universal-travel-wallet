@@ -9,6 +9,7 @@ import { ParticipantMapper } from '../../infrastructure/mappers/participant-mapp
 import { BalanceEngine } from '../../domain/services/balance-engine';
 import { SoftCard } from '../common/SoftCard';
 import { SoftButton } from '../common/SoftButton';
+import { CurrencyAmount } from '../common/CurrencyAmount';
 import { HandCoins, User } from 'lucide-react';
 import { SettlementModal } from '../settlements/SettlementModal';
 
@@ -62,24 +63,25 @@ export function ParticipantBalancesList({ tripId, baseCurrency }: Props) {
 
         let statusText = '';
         if (isFromMe) {
-          statusText = `You owe ${toPerson.name}`;
+          statusText = `You pay ${toPerson.name}`;
         } else if (isToMe) {
-          statusText = `${fromPerson.name} owes you`;
+          statusText = `You take from ${fromPerson.name}`;
         } else {
-          statusText = `${fromPerson.name} owes ${toPerson.name}`;
+          statusText = `${fromPerson.name} pays ${toPerson.name}`;
         }
 
         return (
           <SoftCard key={index} className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isFromMe ? 'bg-destructive/10 text-destructive' : 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isFromMe ? 'bg-destructive/10 text-destructive' : 'bg-success/15 text-success'}`}>
                 <User className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-bold text-foreground">{statusText}</span>
-                <span className={`text-sm font-black ${isFromMe ? 'text-destructive' : 'text-foreground'}`}>
-                  {debt.amount.format()}
-                </span>
+                <CurrencyAmount
+                  money={debt.amount}
+                  className={`text-sm font-black ${isFromMe ? 'text-destructive' : 'text-foreground'}`}
+                />
               </div>
             </div>
             <SoftButton 
